@@ -94,6 +94,130 @@ CATEGORIES = [
 # 每条: (配置键, 类型, 默认值, 中文说明, 分类, 选项)
 # 类型: "bool", "int", "float", "str", "color", "choice", "compact"
 
+# ──────────────────────────────────────────────────────────────────────
+# 命令数据库: (命令ID, 默认快捷键, 中文说明)
+# ──────────────────────────────────────────────────────────────────────
+COMMANDS_DB = [
+    # 文件
+    ("CmdOpenFile", "Ctrl+O", "打开文件"),
+    ("CmdSaveAs", "Ctrl+S", "另存为"),
+    ("CmdClose", "Ctrl+W", "关闭文档"),
+    ("CmdCloseCurrentDocument", "Q", "关闭当前文档"),
+    ("CmdReloadDocument", "R", "重新加载"),
+    ("CmdPrint", "Ctrl+P", "打印"),
+    ("CmdProperties", "Ctrl+D", "文档属性"),
+    ("CmdRenameFile", "F2", "重命名文件"),
+    ("CmdNewWindow", "Ctrl+N", "新窗口"),
+    ("CmdDuplicateInNewWindow", "Shift+Ctrl+N", "在新窗口打开"),
+    ("CmdDuplicateInNewTab", "", "在新标签打开"),
+    ("CmdReopenLastClosedFile", "Shift+Ctrl+T", "恢复上次关闭的"),
+    ("CmdExit", "Ctrl+Q", "退出"),
+    ("CmdSelectAll", "Ctrl+A", "全选"),
+    ("CmdCopySelection", "Ctrl+C", "复制选中"),
+    ("CmdCommandPalette", "Ctrl+K", "命令面板"),
+    ("CmdShowInFolder", "", "在资源管理器中显示"),
+    ("CmdDeleteFile", "", "删除文件"),
+    # 搜索
+    ("CmdFindFirst", "Ctrl+F", "查找"),
+    ("CmdFindNext", "F3", "查找下一个"),
+    ("CmdFindPrev", "Shift+F3", "查找上一个"),
+    ("CmdFindNextSel", "Ctrl+F3", "查找选中文字下一个"),
+    ("CmdFindPrevSel", "Shift+Ctrl+F3", "查找选中文字上一个"),
+    # 视图
+    ("CmdSinglePageView", "Ctrl+6", "单页视图"),
+    ("CmdFacingView", "Ctrl+7", "双页视图"),
+    ("CmdBookView", "Ctrl+8", "书籍视图"),
+    ("CmdToggleContinuousView", "C", "切换连续滚动"),
+    ("CmdToggleFullscreen", "F11", "全屏"),
+    ("CmdTogglePresentationMode", "F5", "演示模式"),
+    ("CmdToggleToolbar", "F8", "显示/隐藏工具栏"),
+    ("CmdToggleMenuBar", "F9", "显示/隐藏菜单栏"),
+    ("CmdInvertColors", "I", "反转颜色"),
+    ("CmdRotateLeft", "[", "向左旋转"),
+    ("CmdRotateRight", "]", "向右旋转"),
+    ("CmdToggleMangaMode", "", "漫画模式"),
+    ("CmdToggleLinks", "", "显示/隐藏链接框"),
+    ("CmdToggleBookmarks", "F12", "显示/隐藏书签"),
+    ("CmdToggleTableOfContents", "", "显示/隐藏目录"),
+    ("CmdToggleScrollbars", "", "显示/隐藏滚动条"),
+    ("CmdTogglePageInfo", "Shift+I", "显示/隐藏页码"),
+    ("CmdSelectNextTheme", "", "切换下一个主题"),
+    # 导航
+    ("CmdGoToNextPage", "N", "下一页"),
+    ("CmdGoToPrevPage", "P", "上一页"),
+    ("CmdGoToFirstPage", "Home", "第一页"),
+    ("CmdGoToLastPage", "End", "最后一页"),
+    ("CmdGoToPage", "G", "跳转到页"),
+    ("CmdScrollUp", "K", "向上滚动"),
+    ("CmdScrollDown", "J", "向下滚动"),
+    ("CmdScrollLeft", "H", "向左滚动"),
+    ("CmdScrollRight", "L", "向右滚动"),
+    ("CmdScrollUpPage", "PageUp", "向上翻页"),
+    ("CmdScrollDownPage", "PageDown", "向下翻页"),
+    ("CmdNavigateBack", "Alt+Left", "后退"),
+    ("CmdNavigateForward", "Alt+Right", "前进"),
+    ("CmdOpenNextFileInFolder", "Shift+Ctrl+Right", "打开下一个文件"),
+    ("CmdOpenPrevFileInFolder", "Shift+Ctrl+Left", "打开上一个文件"),
+    # 标签页
+    ("CmdNextTab", "Ctrl+PageUp", "下一个标签"),
+    ("CmdPrevTab", "Ctrl+PageDown", "上一个标签"),
+    ("CmdNextTabSmart", "Ctrl+Tab", "智能切换标签"),
+    ("CmdPrevTabSmart", "Ctrl+Shift+Tab", "智能切换标签(反向)"),
+    ("CmdMoveTabRight", "Ctrl+Shift+PageUp", "标签右移"),
+    ("CmdMoveTabLeft", "Ctrl+Shift+PageDown", "标签左移"),
+    ("CmdCloseAllTabs", "", "关闭所有标签"),
+    ("CmdCloseOtherTabs", "", "关闭其他标签"),
+    ("CmdCloseTabsToTheLeft", "", "关闭左侧标签"),
+    ("CmdCloseTabsToTheRight", "", "关闭右侧标签"),
+    # 缩放
+    ("CmdZoomIn", "Ctrl+Add", "放大"),
+    ("CmdZoomOut", "Ctrl+Subtract", "缩小"),
+    ("CmdZoomFitPage", "Ctrl+0", "适合页面"),
+    ("CmdZoomFitWidth", "Ctrl+2", "适合宽度"),
+    ("CmdZoomFitContent", "Ctrl+3", "适合内容"),
+    ("CmdZoomActualSize", "Ctrl+1", "实际大小"),
+    ("CmdZoomCustom", "Ctrl+Y", "自定义缩放"),
+    ("CmdToggleZoom", "Z", "切换缩放"),
+    # 收藏夹
+    ("CmdFavoriteAdd", "Ctrl+B", "添加收藏"),
+    ("CmdFavoriteDel", "", "删除收藏"),
+    ("CmdFavoriteToggle", "", "显示/隐藏收藏夹"),
+    # 批注
+    ("CmdCreateAnnotHighlight", "A", "高亮批注"),
+    ("CmdCreateAnnotUnderline", "U", "下划线批注"),
+    ("CmdCreateAnnotStrikeOut", "", "删除线批注"),
+    ("CmdCreateAnnotSquiggly", "", "波浪线批注"),
+    ("CmdCreateAnnotFreeText", "", "文本批注"),
+    ("CmdCreateAnnotText", "", "便签批注"),
+    ("CmdCreateAnnotStamp", "", "图章批注"),
+    ("CmdCreateAnnotInk", "", "墨迹批注"),
+    ("CmdCreateAnnotCircle", "", "圆形批注"),
+    ("CmdCreateAnnotSquare", "", "矩形批注"),
+    ("CmdCreateAnnotLine", "", "线条批注"),
+    ("CmdCreateAnnotPolygon", "", "多边形批注"),
+    ("CmdCreateAnnotPolyLine", "", "折线批注"),
+    ("CmdCreateAnnotCaret", "", "插入符批注"),
+    ("CmdCreateAnnotRedact", "", "遮盖批注"),
+    ("CmdDeleteAnnotation", "Delete", "删除批注"),
+    ("CmdSaveAnnotations", "Shift+Ctrl+S", "保存批注到PDF"),
+    # 外部应用
+    ("CmdTranslateSelectionWithGoogle", "", "Google 翻译选中文字"),
+    ("CmdTranslateSelectionWithDeepL", "", "DeepL 翻译选中文字"),
+    ("CmdSearchSelectionWithGoogle", "", "Google 搜索选中文字"),
+    ("CmdSearchSelectionWithBing", "", "Bing 搜索选中文字"),
+    ("CmdSearchSelectionWithWikipedia", "", "Wikipedia 搜索"),
+    ("CmdSearchSelectionWithGoogleScholar", "", "Google 学术搜索"),
+    ("CmdOpenWithAcrobat", "", "用 Acrobat 打开"),
+    ("CmdOpenWithFoxIt", "", "用 Foxit 打开"),
+    ("CmdSendByEmail", "", "通过邮件发送"),
+    # 帮助
+    ("CmdHelpOpenManual", "F1", "打开手册"),
+    ("CmdOptions", "", "选项"),
+    ("CmdAdvancedOptions", "", "高级设置"),
+    ("CmdCheckUpdate", "", "检查更新"),
+    ("CmdChangeLanguage", "", "更改语言"),
+]
+
 SETTINGS_META = [
     # ══════════════════════════════════════════════
     # 常规
@@ -383,7 +507,35 @@ class SettingsFile:
                         if depth == 0:
                             i += 1
                             break
-                    elif sl == "[" or sl.startswith("["):
+                    elif sl == "[":
+                        # 数组元素开始
+                        depth += 1
+                        i += 1
+                        elem_items = []
+                        elem_depth = 1
+                        while i < len(lines) and elem_depth > 0:
+                            elem_sl = lines[i].rstrip("\r\n").strip()
+                            if elem_sl == "]":
+                                elem_depth -= 1
+                                if elem_depth == 0:
+                                    i += 1
+                                    break
+                            elif elem_sl == "[":
+                                elem_depth += 1
+                                i += 1
+                                continue
+                            if not elem_sl or elem_sl.startswith(";"):
+                                i += 1
+                                continue
+                            elem_kv = re.match(r'^(\w+)\s*=\s*(.*)', elem_sl)
+                            if elem_kv:
+                                ek, ev = elem_kv.group(1), elem_kv.group(2).strip()
+                                elem_items.append(("kv", ek, ev))
+                            i += 1
+                        items.append(("struct", "", elem_items))
+                        depth -= 1
+                        continue
+                    elif sl.startswith("["):
                         depth += 1
                         i += 1
                         continue
@@ -467,6 +619,69 @@ class SettingsFile:
         with open(save_path, "w", encoding="utf-8") as f:
             f.writelines(output_lines)
 
+    def get_shortcuts(self) -> dict[str, dict[str, str]]:
+        """从解析树中提取 Shortcuts 数组，返回 {cmd_id: {Key:, Name:, ToolbarText:}}"""
+        result = {}
+        for entry in self._parse_tree:
+            if entry[0] == "struct" and entry[1] == "Shortcuts":
+                for item in entry[2]:
+                    if item[0] == "struct" and item[1] == "":
+                        # 这是一个快捷键条目
+                        cmd_id = ""
+                        key_val = ""
+                        name_val = ""
+                        toolbar_val = ""
+                        for sub in item[2]:
+                            if sub[0] == "kv":
+                                if sub[1] == "Cmd":
+                                    cmd_id = sub[2]
+                                elif sub[1] == "Key":
+                                    key_val = sub[2]
+                                elif sub[1] == "Name":
+                                    name_val = sub[2]
+                                elif sub[1] == "ToolbarText":
+                                    toolbar_val = sub[2]
+                        if cmd_id:
+                            # 只取纯命令名（去掉参数部分如 #00ff00 openedit）
+                            pure_cmd = cmd_id.split()[0] if cmd_id else ""
+                            result[pure_cmd] = {
+                                "Cmd": cmd_id,
+                                "Key": key_val,
+                                "Name": name_val,
+                                "ToolbarText": toolbar_val,
+                            }
+        return result
+
+    def set_shortcuts(self, shortcuts: list[dict[str, str]]):
+        """设置 Shortcuts 数组。shortcuts 是 [{Cmd:, Key:, Name:, ToolbarText:}] 列表。"""
+        # 找到并替换 Shortcuts 在解析树中的位置
+        new_items = []
+        for sc in shortcuts:
+            if not sc.get("Key", "").strip():
+                continue  # 没有快捷键的跳过
+            entry_items = [("kv", "Cmd", sc["Cmd"])]
+            entry_items.append(("kv", "Key", sc["Key"]))
+            if sc.get("Name"):
+                entry_items.append(("kv", "Name", sc["Name"]))
+            if sc.get("ToolbarText"):
+                entry_items.append(("kv", "ToolbarText", sc["ToolbarText"]))
+            new_items.append(("struct", "", entry_items))
+
+        # 在解析树中找到 Shortcuts 并替换
+        for i, entry in enumerate(self._parse_tree):
+            if entry[0] == "struct" and entry[1] == "Shortcuts":
+                self._parse_tree[i] = ("struct", "Shortcuts", new_items)
+                return
+
+        # 如果没有 Shortcuts，添加到末尾（在注释行之前）
+        insert_idx = len(self._parse_tree)
+        for i in range(len(self._parse_tree) - 1, -1, -1):
+            if self._parse_tree[i][0] == "comment":
+                insert_idx = i
+            else:
+                break
+        self._parse_tree.insert(insert_idx, ("struct", "Shortcuts", new_items))
+
     def _rebuild_lines(self) -> list[str]:
         lines = []
         for entry in self._parse_tree:
@@ -478,24 +693,39 @@ class SettingsFile:
                 lines.append(f"{key} = {val}\n")
             elif entry[0] == "struct":
                 _, name, items = entry
-                lines.append(f"{name} [\n")
-                for item in items:
-                    if item[0] == "kv":
-                        _, key, _ = item
-                        full_key = f"{name}.{key}"
-                        val = self.settings.get(full_key, "")
-                        lines.append(f"    {key} = {val}\n")
-                    elif item[0] == "struct":
-                        _, sub_name, sub_items = item
-                        lines.append(f"    {sub_name} [\n")
-                        for si in sub_items:
-                            if si[0] == "kv":
-                                _, sk, _ = si
-                                full_key = f"{name}.{sub_name}.{sk}"
-                                val = self.settings.get(full_key, "")
-                                lines.append(f"        {sk} = {val}\n")
-                        lines.append(f"    ]\n")
-                lines.append(f"]\n")
+                # Shortcuts 数组特殊处理：直接从 parse tree 写出值
+                if name == "Shortcuts":
+                    lines.append(f"{name} [\n")
+                    for item in items:
+                        if item[0] == "struct" and item[1] == "":
+                            # 数组元素
+                            lines.append("  [\n")
+                            for si in item[2]:
+                                if si[0] == "kv":
+                                    _, sk, sv = si
+                                    lines.append(f"    {sk} = {sv}\n")
+                            lines.append("  ]\n")
+                    lines.append("]\n")
+                else:
+                    lines.append(f"{name} [\n")
+                    for item in items:
+                        if item[0] == "kv":
+                            _, key, _ = item
+                            full_key = f"{name}.{key}"
+                            val = self.settings.get(full_key, "")
+                            lines.append(f"    {key} = {val}\n")
+                        elif item[0] == "struct":
+                            _, sub_name, sub_items = item
+                            if sub_name:
+                                lines.append(f"    {sub_name} [\n")
+                                for si in sub_items:
+                                    if si[0] == "kv":
+                                        _, sk, _ = si
+                                        full_key = f"{name}.{sub_name}.{sk}"
+                                        val = self.settings.get(full_key, "")
+                                        lines.append(f"        {sk} = {val}\n")
+                                lines.append(f"    ]\n")
+                    lines.append(f"]\n")
         return lines
 
 
@@ -790,174 +1020,10 @@ class SettingsEditor(tk.Tk):
             self._pages[cat] = (page, widgets)
 
     def _build_array_category_page(self, page, page_type):
-        """为数组类型的分类（快捷键、外部查看器等）构建参考信息页面。"""
+        """为数组类型的分类（快捷键、外部查看器等）构建可视化编辑页面。"""
 
         if page_type == "shortcuts":
-            # 快捷键格式说明
-            fmt_frame = tk.Frame(page, bg=Colors.CARD_BG,
-                                 highlightbackground=Colors.BORDER, highlightthickness=1)
-            fmt_frame.pack(fill="x", padx=28, pady=(0, 12))
-            fmt_inner = tk.Frame(fmt_frame, bg=Colors.CARD_BG)
-            fmt_inner.pack(fill="x", padx=20, pady=16)
-            tk.Label(fmt_inner, text="自定义快捷键格式", font=Fonts.BODY_BOLD,
-                     bg=Colors.CARD_BG, fg=Colors.TEXT).pack(anchor="w")
-            tk.Label(fmt_inner, text=(
-                "在设置文件中添加 Shortcuts 数组来自定义快捷键：\n\n"
-                "Shortcuts [\n"
-                "  [\n"
-                "    Cmd = CmdFindNext\n"
-                "    Key = F3\n"
-                "  ]\n"
-                "  [\n"
-                "    Cmd = CmdCreateAnnotHighlight #00ff00 openedit\n"
-                "    Key = a\n"
-                "  ]\n"
-                "]"
-            ), font=("Consolas", 10), bg=Colors.CARD_BG, fg=Colors.TEXT_SECONDARY,
-                justify="left").pack(anchor="w", pady=(8, 0))
-
-            # 命令列表
-            commands = [
-                # (分类, [(命令ID, 默认快捷键, 说明)])
-                ("文件操作", [
-                    ("CmdOpenFile", "Ctrl+O", "打开文件"),
-                    ("CmdSaveAs", "Ctrl+S", "另存为"),
-                    ("CmdClose", "Ctrl+W", "关闭文档"),
-                    ("CmdCloseCurrentDocument", "Q", "关闭当前文档"),
-                    ("CmdReloadDocument", "R", "重新加载"),
-                    ("CmdPrint", "Ctrl+P", "打印"),
-                    ("CmdProperties", "Ctrl+D", "文档属性"),
-                    ("CmdRenameFile", "F2", "重命名文件"),
-                    ("CmdNewWindow", "Ctrl+N", "新窗口"),
-                    ("CmdDuplicateInNewWindow", "Shift+Ctrl+N", "在新窗口打开"),
-                    ("CmdReopenLastClosedFile", "Shift+Ctrl+T", "恢复上次关闭的"),
-                    ("CmdExit", "Ctrl+Q", "退出"),
-                    ("CmdSelectAll", "Ctrl+A", "全选"),
-                    ("CmdCopySelection", "Ctrl+C", "复制选中"),
-                    ("CmdCommandPalette", "Ctrl+K", "命令面板"),
-                ]),
-                ("搜索", [
-                    ("CmdFindFirst", "Ctrl+F", "查找"),
-                    ("CmdFindNext", "F3", "查找下一个"),
-                    ("CmdFindPrev", "Shift+F3", "查找上一个"),
-                    ("CmdFindNextSel", "Ctrl+F3", "查找选中文字下一个"),
-                    ("CmdFindPrevSel", "Shift+Ctrl+F3", "查找选中文字上一个"),
-                ]),
-                ("页面视图", [
-                    ("CmdSinglePageView", "Ctrl+6", "单页视图"),
-                    ("CmdFacingView", "Ctrl+7", "双页视图"),
-                    ("CmdBookView", "Ctrl+8", "书籍视图"),
-                    ("CmdToggleContinuousView", "C", "切换连续滚动"),
-                    ("CmdToggleFullscreen", "F11", "全屏"),
-                    ("CmdTogglePresentationMode", "F5", "演示模式"),
-                    ("CmdToggleToolbar", "F8", "显示/隐藏工具栏"),
-                    ("CmdToggleMenuBar", "F9", "显示/隐藏菜单栏"),
-                    ("CmdInvertColors", "I", "反转颜色"),
-                    ("CmdRotateLeft", "[", "向左旋转"),
-                    ("CmdRotateRight", "]", "向右旋转"),
-                    ("CmdToggleMangaMode", "", "漫画模式"),
-                    ("CmdToggleLinks", "", "显示/隐藏链接框"),
-                ]),
-                ("页面导航", [
-                    ("CmdGoToNextPage", "N", "下一页"),
-                    ("CmdGoToPrevPage", "P", "上一页"),
-                    ("CmdGoToFirstPage", "Home", "第一页"),
-                    ("CmdGoToLastPage", "End", "最后一页"),
-                    ("CmdGoToPage", "G", "跳转到页"),
-                    ("CmdScrollUp", "K / ↑", "向上滚动"),
-                    ("CmdScrollDown", "J / ↓", "向下滚动"),
-                    ("CmdScrollLeft", "H / ←", "向左滚动"),
-                    ("CmdScrollRight", "L / →", "向右滚动"),
-                    ("CmdScrollUpPage", "PageUp", "向上翻页"),
-                    ("CmdScrollDownPage", "PageDown", "向下翻页"),
-                    ("CmdNavigateBack", "Alt+←", "后退"),
-                    ("CmdNavigateForward", "Alt+→", "前进"),
-                    ("CmdOpenNextFileInFolder", "Shift+Ctrl+→", "打开下一个文件"),
-                    ("CmdOpenPrevFileInFolder", "Shift+Ctrl+←", "打开上一个文件"),
-                ]),
-                ("标签页", [
-                    ("CmdNextTab", "Ctrl+PageUp", "下一个标签"),
-                    ("CmdPrevTab", "Ctrl+PageDown", "上一个标签"),
-                    ("CmdNextTabSmart", "Ctrl+Tab", "智能切换标签"),
-                    ("CmdPrevTabSmart", "Ctrl+Shift+Tab", "智能切换标签(反向)"),
-                    ("CmdMoveTabRight", "Ctrl+Shift+PageUp", "标签右移"),
-                    ("CmdMoveTabLeft", "Ctrl+Shift+PageDown", "标签左移"),
-                    ("CmdCloseAllTabs", "", "关闭所有标签"),
-                    ("CmdCloseOtherTabs", "", "关闭其他标签"),
-                    ("CmdCloseTabsToTheLeft", "", "关闭左侧标签"),
-                    ("CmdCloseTabsToTheRight", "", "关闭右侧标签"),
-                ]),
-                ("缩放", [
-                    ("CmdZoomIn", "Ctrl++", "放大"),
-                    ("CmdZoomOut", "Ctrl+-", "缩小"),
-                    ("CmdZoomFitPage", "Ctrl+0", "适合页面"),
-                    ("CmdZoomFitWidth", "Ctrl+2", "适合宽度"),
-                    ("CmdZoomFitContent", "Ctrl+3", "适合内容"),
-                    ("CmdZoomActualSize", "Ctrl+1", "实际大小"),
-                    ("CmdZoomCustom", "Ctrl+Y", "自定义缩放"),
-                    ("CmdToggleZoom", "Z", "切换缩放"),
-                ]),
-                ("收藏夹", [
-                    ("CmdFavoriteAdd", "Ctrl+B", "添加收藏"),
-                    ("CmdFavoriteDel", "", "删除收藏"),
-                    ("CmdFavoriteToggle", "", "显示/隐藏收藏夹"),
-                ]),
-                ("批注", [
-                    ("CmdCreateAnnotHighlight", "A", "高亮批注"),
-                    ("CmdCreateAnnotUnderline", "U", "下划线批注"),
-                    ("CmdCreateAnnotStrikeOut", "", "删除线批注"),
-                    ("CmdCreateAnnotSquiggly", "", "波浪线批注"),
-                    ("CmdCreateAnnotFreeText", "", "文本批注"),
-                    ("CmdCreateAnnotText", "", "便签批注"),
-                    ("CmdCreateAnnotStamp", "", "图章批注"),
-                    ("CmdCreateAnnotInk", "", "墨迹批注"),
-                    ("CmdCreateAnnotCircle", "", "圆形批注"),
-                    ("CmdCreateAnnotSquare", "", "矩形批注"),
-                    ("CmdCreateAnnotLine", "", "线条批注"),
-                    ("CmdCreateAnnotPolygon", "", "多边形批注"),
-                    ("CmdDeleteAnnotation", "Delete", "删除批注"),
-                    ("CmdSaveAnnotations", "Shift+Ctrl+S", "保存批注到PDF"),
-                ]),
-                ("外部应用", [
-                    ("CmdTranslateSelectionWithGoogle", "", "Google 翻译选中文字"),
-                    ("CmdTranslateSelectionWithDeepL", "", "DeepL 翻译选中文字"),
-                    ("CmdSearchSelectionWithGoogle", "", "Google 搜索选中文字"),
-                    ("CmdSearchSelectionWithBing", "", "Bing 搜索选中文字"),
-                    ("CmdSearchSelectionWithWikipedia", "", "Wikipedia 搜索"),
-                    ("CmdSearchSelectionWithGoogleScholar", "", "Google 学术搜索"),
-                    ("CmdOpenWithAcrobat", "", "用 Acrobat 打开"),
-                    ("CmdOpenWithFoxIt", "", "用 Foxit 打开"),
-                    ("CmdSendByEmail", "", "通过邮件发送"),
-                ]),
-                ("帮助与系统", [
-                    ("CmdHelpOpenManual", "F1", "打开手册"),
-                    ("CmdOptions", "", "选项"),
-                    ("CmdAdvancedOptions", "", "高级设置"),
-                    ("CmdCheckUpdate", "", "检查更新"),
-                    ("CmdChangeLanguage", "", "更改语言"),
-                ]),
-            ]
-
-            for group_name, cmds in commands:
-                group_frame = tk.Frame(page, bg=Colors.CARD_BG,
-                                       highlightbackground=Colors.BORDER, highlightthickness=1)
-                group_frame.pack(fill="x", padx=28, pady=(0, 8))
-                group_inner = tk.Frame(group_frame, bg=Colors.CARD_BG)
-                group_inner.pack(fill="x", padx=20, pady=12)
-
-                tk.Label(group_inner, text=group_name, font=Fonts.BODY_BOLD,
-                         bg=Colors.CARD_BG, fg=Colors.ACCENT).pack(anchor="w", pady=(0, 6))
-
-                for cmd_id, shortcut, desc in cmds:
-                    row = tk.Frame(group_inner, bg=Colors.CARD_BG)
-                    row.pack(fill="x", pady=1)
-                    tk.Label(row, text=cmd_id, font=("Consolas", 9),
-                             bg=Colors.CARD_BG, fg=Colors.TEXT_MUTED, width=32, anchor="w").pack(side="left")
-                    tk.Label(row, text=shortcut, font=Fonts.SMALL,
-                             bg=Colors.CARD_BG, fg=Colors.ACCENT, width=16, anchor="w").pack(side="left")
-                    tk.Label(row, text=desc, font=Fonts.SMALL,
-                             bg=Colors.CARD_BG, fg=Colors.TEXT_SECONDARY, anchor="w").pack(side="left")
-
+            self._build_shortcuts_editor(page)
         elif page_type == "external":
             tk.Label(page, text=(
                 "外部查看器是数组格式，需要手动编辑设置文件。\n\n"
@@ -986,6 +1052,143 @@ class SettingsEditor(tk.Tk):
                 "]"
             ), font=("Consolas", 10), bg=Colors.BG, fg=Colors.TEXT_SECONDARY,
                 justify="left", wraplength=650).pack(pady=40, padx=28, anchor="w")
+
+    def _build_shortcuts_editor(self, page):
+        """构建快捷键可视化编辑器。"""
+        # 读取现有的自定义快捷键
+        existing = self.settings_file.get_shortcuts()
+
+        # 构建命令分组
+        groups = {}
+        for cmd_id, default_key, desc in COMMANDS_DB:
+            # 确定分组
+            if cmd_id.startswith("CmdOpen") or cmd_id.startswith("CmdSave") or \
+               cmd_id.startswith("CmdClose") or cmd_id.startswith("CmdPrint") or \
+               cmd_id.startswith("CmdNew") or cmd_id.startswith("CmdExit") or \
+               cmd_id in ("CmdReloadDocument", "CmdRenameFile", "CmdReopenLastClosedFile",
+                           "CmdDuplicateInNewWindow", "CmdDuplicateInNewTab",
+                           "CmdSelectAll", "CmdCopySelection", "CmdCommandPalette",
+                           "CmdShowInFolder", "CmdDeleteFile", "CmdProperties"):
+                group = "文件"
+            elif cmd_id.startswith("CmdFind"):
+                group = "搜索"
+            elif cmd_id.startswith("CmdToggle") and ("View" in cmd_id or "Fullscreen" in cmd_id
+                                                       or "Presentation" in cmd_id or "Toolbar" in cmd_id
+                                                       or "MenuBar" in cmd_id or "Manga" in cmd_id
+                                                       or "Links" in cmd_id or "Bookmarks" in cmd_id
+                                                       or "TableOfContents" in cmd_id or "Scrollbars" in cmd_id
+                                                       or "PageInfo" in cmd_id):
+                group = "视图"
+            elif cmd_id.startswith("CmdSelectNextTheme"):
+                group = "视图"
+            elif cmd_id.startswith("CmdSingle") or cmd_id.startswith("CmdFacing") or cmd_id.startswith("CmdBook"):
+                group = "视图"
+            elif cmd_id.startswith("CmdInvert") or cmd_id.startswith("CmdRotate"):
+                group = "视图"
+            elif cmd_id.startswith("CmdScroll") or cmd_id.startswith("CmdGoTo") or \
+                 cmd_id.startswith("CmdNavigate") or cmd_id.startswith("CmdOpenNext") or \
+                 cmd_id.startswith("CmdOpenPrev"):
+                group = "导航"
+            elif "Tab" in cmd_id and cmd_id.startswith("Cmd"):
+                group = "标签页"
+            elif cmd_id.startswith("CmdZoom"):
+                group = "缩放"
+            elif cmd_id.startswith("CmdFavorite"):
+                group = "收藏夹"
+            elif cmd_id.startswith("CmdCreateAnnot") or cmd_id.startswith("CmdDeleteAnnotation") or \
+                 cmd_id.startswith("CmdSaveAnnotations") or cmd_id.startswith("CmdEditAnnotations") or \
+                 cmd_id.startswith("CmdShowAnnotations") or cmd_id.startswith("CmdHideAnnotations") or \
+                 cmd_id.startswith("CmdToggleShowAnnotations"):
+                group = "批注"
+            elif "Translate" in cmd_id or "Search" in cmd_id or "OpenWith" in cmd_id or \
+                 "SendByEmail" in cmd_id:
+                group = "外部应用"
+            else:
+                group = "其他"
+
+            if group not in groups:
+                groups[group] = []
+
+            # 获取当前快捷键（用户自定义 > 默认）
+            current_key = default_key
+            if cmd_id in existing:
+                user_key = existing[cmd_id].get("Key", "").strip()
+                if user_key:
+                    current_key = user_key
+
+            groups[group].append((cmd_id, default_key, current_key, desc))
+
+        # 存储所有输入框变量，用于保存时收集
+        self._shortcut_vars: dict[str, tk.StringVar] = {}
+
+        # 提示信息
+        hint_frame = tk.Frame(page, bg=Colors.ACCENT_LIGHT)
+        hint_frame.pack(fill="x", padx=28, pady=(0, 12))
+        tk.Label(hint_frame, text=(
+            "💡 修改快捷键后点击「保存」即可生效，无需重启 SumatraPDF。\n"
+            "留空表示使用默认快捷键，输入 CmdNone 可禁用该快捷键。"
+        ), font=Fonts.SMALL, bg=Colors.ACCENT_LIGHT, fg=Colors.ACCENT,
+            justify="left", padx=16, pady=10).pack(anchor="w")
+
+        # 表头
+        header_frame = tk.Frame(page, bg=Colors.BG)
+        header_frame.pack(fill="x", padx=28, pady=(0, 4))
+        tk.Label(header_frame, text="命令", font=Fonts.SMALL_MUTED,
+                 bg=Colors.BG, fg=Colors.TEXT_MUTED, width=28, anchor="w").pack(side="left")
+        tk.Label(header_frame, text="说明", font=Fonts.SMALL_MUTED,
+                 bg=Colors.BG, fg=Colors.TEXT_MUTED, width=20, anchor="w").pack(side="left")
+        tk.Label(header_frame, text="默认快捷键", font=Fonts.SMALL_MUTED,
+                 bg=Colors.BG, fg=Colors.TEXT_MUTED, width=16, anchor="w").pack(side="left")
+        tk.Label(header_frame, text="当前快捷键", font=Fonts.SMALL_MUTED,
+                 bg=Colors.BG, fg=Colors.TEXT_MUTED, width=16, anchor="w").pack(side="left")
+
+        # 按分组显示
+        group_order = ["文件", "搜索", "视图", "导航", "标签页", "缩放", "收藏夹", "批注", "外部应用", "其他"]
+        for group_name in group_order:
+            if group_name not in groups:
+                continue
+            cmds = groups[group_name]
+
+            group_frame = tk.Frame(page, bg=Colors.CARD_BG,
+                                   highlightbackground=Colors.BORDER, highlightthickness=1)
+            group_frame.pack(fill="x", padx=28, pady=(0, 8))
+            group_inner = tk.Frame(group_frame, bg=Colors.CARD_BG)
+            group_inner.pack(fill="x", padx=16, pady=10)
+
+            tk.Label(group_inner, text=group_name, font=Fonts.BODY_BOLD,
+                     bg=Colors.CARD_BG, fg=Colors.ACCENT).pack(anchor="w", pady=(0, 6))
+
+            for cmd_id, default_key, current_key, desc in cmds:
+                row = tk.Frame(group_inner, bg=Colors.CARD_BG)
+                row.pack(fill="x", pady=1)
+
+                # 命令 ID
+                tk.Label(row, text=cmd_id, font=("Consolas", 9),
+                         bg=Colors.CARD_BG, fg=Colors.TEXT_MUTED, width=28, anchor="w").pack(side="left")
+
+                # 说明
+                tk.Label(row, text=desc, font=Fonts.SMALL,
+                         bg=Colors.CARD_BG, fg=Colors.TEXT_SECONDARY, width=20, anchor="w").pack(side="left")
+
+                # 默认快捷键
+                tk.Label(row, text=default_key if default_key else "—", font=Fonts.SMALL,
+                         bg=Colors.CARD_BG, fg=Colors.TEXT_MUTED, width=16, anchor="w").pack(side="left")
+
+                # 当前快捷键（可编辑）
+                var = tk.StringVar(value=current_key)
+                self._shortcut_vars[cmd_id] = (var, default_key)
+
+                entry_frame = tk.Frame(row, bg=Colors.INPUT_BORDER, padx=1, pady=1)
+                entry_frame.pack(side="left")
+                entry = tk.Entry(entry_frame, textvariable=var, font=Fonts.SMALL, width=16,
+                                 bg=Colors.INPUT_BG, fg=Colors.TEXT, bd=0,
+                                 highlightthickness=1, highlightcolor=Colors.INPUT_FOCUS,
+                                 highlightbackground=Colors.INPUT_BORDER)
+                entry.pack(fill="x", padx=2, pady=2)
+
+                # 如果与默认不同，高亮显示
+                if current_key != default_key:
+                    entry.configure(fg=Colors.ACCENT)
 
     def _select_category(self, category: str, idx: int):
         # 更新侧边栏选中状态
@@ -1099,6 +1302,32 @@ class SettingsEditor(tk.Tk):
                 else:
                     val = str(widget)
                 self.settings_file.set_value(key, val)
+
+        # 收集快捷键设置
+        if hasattr(self, '_shortcut_vars') and self._shortcut_vars:
+            shortcuts = []
+            for cmd_id, (var, default_key) in self._shortcut_vars.items():
+                key_val = var.get().strip()
+                if key_val and key_val != default_key:
+                    # 用户自定义了快捷键
+                    shortcuts.append({"Cmd": cmd_id, "Key": key_val})
+                elif key_val == default_key and default_key:
+                    # 保持默认（不写入 Shortcuts 数组）
+                    pass
+            # 如果有任何自定义快捷键，写入
+            # 也保留已有的带参数的命令（如 CmdCreateAnnotHighlight #00ff00）
+            existing = self.settings_file.get_shortcuts()
+            for cmd_id, info in existing.items():
+                full_cmd = info.get("Cmd", "")
+                if " " in full_cmd:  # 带参数的命令
+                    # 检查用户是否修改了这个
+                    if cmd_id in self._shortcut_vars:
+                        user_key = self._shortcut_vars[cmd_id][0].get().strip()
+                        if user_key:
+                            shortcuts.append({"Cmd": full_cmd, "Key": user_key})
+                    else:
+                        shortcuts.append(info)
+            self.settings_file.set_shortcuts(shortcuts)
 
     def _open_file(self):
         path = filedialog.askopenfilename(
