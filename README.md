@@ -9,43 +9,50 @@ SumatraPDF 高级设置可视化编辑工具，替代手动编辑文本配置文
 > ⚠️ SumatraPDF 的设置项可能随版本更新发生变化。如遇到新版本新增或修改的设置，
 > 请参考[最新官方文档](https://www.sumatrapdfreader.org/settings/settings)并更新本工具中的设置定义。
 
+## 下载
+
+- [最新 Release](https://github.com/xultral/SumatraPDF-Configurator/releases) — 下载 EXE 即用，无需安装 Python
+- 或直接运行源码：`python SumatraPDF-Settings-Editor.py`
+
 ## 功能
 
-- **可视化编辑** — 图形界面修改 SumatraPDF 高级设置
-- **分类浏览** — 15 个分类，覆盖 3.6 版本所有简单类型设置
-- **智能控件** — 布尔值用复选框，枚举用下拉框，颜色用颜色选择器
+### 可视化编辑器
+
+- **简单设置** — 布尔值用自定义大复选框，枚举用下拉框，颜色用颜色选择器（带预览色块）
+- **快捷键编辑器** — 显示所有 100+ 个命令，可直接修改快捷键绑定，带中文说明
+- **外部查看器** — 可视化添加/编辑外部程序（预置 Adobe Acrobat、Foxit、PDF-XChange）
+- **选中文字处理** — 可视化添加翻译/搜索服务（预置 Google 翻译、DeepL、百度、Wikipedia）
+- **自定义主题** — 可视化创建颜色主题（预置 Solarized Dark、Dracula、Nord、One Dark 等）
 - **保留结构** — 保存时不破坏原文件的注释和格式
-- **数组设置提示** — 快捷键、外部查看器等数组类型设置提供格式示例
 - **自动检测** — 自动查找安装版/便携版的设置文件位置
 
-## 截图
+### 分类浏览（15 个分类）
 
-```
-┌──────────────┬──────────────────────────────────────────────┐
-│ 设置分类      │ 常规                                         │
-│              │                                              │
-│ ▶ 常规       │  每天检查一次更新                              │
-│   显示与缩放  │  CheckForUpdates                             │
-│   界面与交互  │  ☐ 启用                                      │
-│   颜色与主题  │  ─────────────────────────────────────────── │
-│   固定页面 UI │  在标签页中打开文档（而非新窗口）               │
-│   电子书 UI   │  UseTabs                                     │
-│   漫画书 UI   │  ☑ 启用                                      │
-│   图片 UI     │  ─────────────────────────────────────────── │
-│   批注        │  ...                                         │
-│   正向搜索    │                                              │
-│   打印        │                                              │
-│   全屏模式    │                                              │
-│   AI 聊天     │                                              │
-│   专家/内部   │                                              │
-└──────────────┴──────────────────────────────────────────────┘
-```
+| 分类 | 设置项数 | 说明 |
+|------|---------|------|
+| 常规 | 10 | 自动更新、标签页、会话恢复、语言 |
+| 页面显示 | 8 | 页面布局、缩放、滚动、抗锯齿 |
+| 工具栏与侧边栏 | 13 | 工具栏、菜单栏、侧边栏、标签页、字体 |
+| 主题与外观 | 3 | 主题 (light/dark/darker)、背景色 |
+| PDF / XPS / DjVu 页面 | 8 | 文字/背景颜色、边距、渐变、滚动条 |
+| 电子书 | 5 | 字体、布局、自定义 CSS |
+| 漫画与图片 | 3 | 边距、漫画模式 |
+| CHM 帮助文件 | 1 | 是否用 PDF 渲染方式 |
+| PDF 批注 | 12 | 高亮/下划线/删除线颜色、文本批注 |
+| LaTeX 正向搜索 | 4 | 高亮样式、颜色 |
+| 打印 | 1 | 默认缩放方式 |
+| 快捷键 | 100+ | 可视化编辑器，带命令参考表 |
+| 外部查看器 | — | 可视化编辑器，带预设模板 |
+| 选中文字处理 | — | 可视化编辑器，带预设模板 |
+| 自定义主题 | — | 可视化编辑器，带预设主题 |
+| 高级选项 | 9 | DPI、TeX、密码、Esc 退出等 |
 
 ## 使用方法
 
 ### 环境要求
 
-- Python 3.8+（tkinter 已包含在标准 Python 发行版中）
+- Python 3.8+（tkinter 和 Pillow 为依赖）
+- 或直接下载 EXE（无需任何依赖）
 
 ### 运行
 
@@ -64,25 +71,14 @@ python SumatraPDF-Settings-Editor.py "C:\Users\你的用户名\AppData\Local\Sum
 | 安装版 | `%LOCALAPPDATA%\SumatraPDF\SumatraPDF-settings.txt` |
 | 便携版 | 与 `SumatraPDF.exe` 同目录 |
 
-## 分类说明
+## 打包 EXE
 
-| 分类 | 设置项数 | 说明 |
-|------|---------|------|
-| 常规 | 10 | 自动更新、标签页、会话恢复、语言 |
-| 页面显示 | 8 | 页面布局、缩放、滚动、抗锯齿 |
-| 工具栏与侧边栏 | 13 | 工具栏、菜单栏、侧边栏、标签页、字体 |
-| 主题与外观 | 3 | 主题 (light/dark/darker)、背景色 |
-| PDF / XPS / DjVu 页面 | 8 | 文字/背景颜色、边距、渐变、滚动条 |
-| 电子书 | 5 | 字体、布局、自定义 CSS |
-| 漫画与图片 | 3 | 边距、漫画模式 |
-| CHM 帮助文件 | 1 | 是否用 PDF 渲染方式 |
-| PDF 批注 | 12 | 高亮/下划线/删除线颜色、文本批注 |
-| LaTeX 正向搜索 | 4 | 高亮样式、颜色 |
-| 打印 | 1 | 默认缩放方式 |
-| 快捷键 | — | 数组类型，需手动编辑 |
-| 外部查看器 | — | 数组类型，需手动编辑 |
-| 选中文字处理 | — | 数组类型，需手动编辑 |
-| 高级选项 | 9 | DPI、TeX、密码、Esc 退出等 |
+```bash
+pip install pyinstaller pillow
+python -m PyInstaller --onefile --windowed --name SumatraPDF-Settings-Editor --icon logo.png --add-data "logo.png;." --exclude-module numpy --exclude-module pandas --exclude-module matplotlib --exclude-module pygame --exclude-module psutil -y SumatraPDF-Settings-Editor.py
+```
+
+生成的 EXE 在 `dist/SumatraPDF-Settings-Editor.exe`。
 
 ## 其他工具
 
