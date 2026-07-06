@@ -770,17 +770,15 @@ class SettingsEditor(tk.Tk):
                      bg=Colors.BG, fg=Colors.TEXT).pack(anchor="w")
 
             cat_settings = [s for s in SETTINGS_META if s[4] == cat]
-            # 对于数组类型的分类，显示提示
+            # 对于数组类型的分类，显示提示和参考信息
             array_categories = {
-                "快捷键": "快捷键是数组格式，需要手动编辑设置文件。\n\n格式示例：\nShortcuts [\n  [\n    Cmd = CmdFindNext\n    Key = F3\n  ]\n]",
-                "外部查看器": "外部查看器是数组格式，需要手动编辑设置文件。\n\n格式示例：\nExternalViewers [\n  [\n    CommandLine = \"C:\\Path\\to\\viewer.exe\" \"%1\"\n    Name = 我的查看器\n    Filter = *.pdf\n    Key = Alt + 1\n  ]\n]",
-                "选中文字处理": "选中文字处理是数组格式，需要手动编辑设置文件。\n\n格式示例：\nSelectionHandlers [\n  [\n    URL = https://translate.google.com/?sl=auto&tl=zh-CN&text=${selection}\n    Name = Google 翻译\n  ]\n]",
+                "快捷键": "shortcuts",
+                "外部查看器": "external",
+                "选中文字处理": "selection",
             }
             if not cat_settings:
                 if cat in array_categories:
-                    tk.Label(page, text=array_categories[cat],
-                             font=Fonts.BODY, bg=Colors.BG, fg=Colors.TEXT_SECONDARY,
-                             justify="left", wraplength=650).pack(pady=40, padx=28, anchor="w")
+                    self._build_array_category_page(page, array_categories[cat])
                 else:
                     tk.Label(page, text="此分类没有可编辑的设置项",
                              font=Fonts.BODY, bg=Colors.BG, fg=Colors.TEXT_MUTED).pack(pady=40)
@@ -790,6 +788,204 @@ class SettingsEditor(tk.Tk):
                     self._add_setting_card(page, key, stype, default, desc, options, widgets)
 
             self._pages[cat] = (page, widgets)
+
+    def _build_array_category_page(self, page, page_type):
+        """为数组类型的分类（快捷键、外部查看器等）构建参考信息页面。"""
+
+        if page_type == "shortcuts":
+            # 快捷键格式说明
+            fmt_frame = tk.Frame(page, bg=Colors.CARD_BG,
+                                 highlightbackground=Colors.BORDER, highlightthickness=1)
+            fmt_frame.pack(fill="x", padx=28, pady=(0, 12))
+            fmt_inner = tk.Frame(fmt_frame, bg=Colors.CARD_BG)
+            fmt_inner.pack(fill="x", padx=20, pady=16)
+            tk.Label(fmt_inner, text="自定义快捷键格式", font=Fonts.BODY_BOLD,
+                     bg=Colors.CARD_BG, fg=Colors.TEXT).pack(anchor="w")
+            tk.Label(fmt_inner, text=(
+                "在设置文件中添加 Shortcuts 数组来自定义快捷键：\n\n"
+                "Shortcuts [\n"
+                "  [\n"
+                "    Cmd = CmdFindNext\n"
+                "    Key = F3\n"
+                "  ]\n"
+                "  [\n"
+                "    Cmd = CmdCreateAnnotHighlight #00ff00 openedit\n"
+                "    Key = a\n"
+                "  ]\n"
+                "]"
+            ), font=("Consolas", 10), bg=Colors.CARD_BG, fg=Colors.TEXT_SECONDARY,
+                justify="left").pack(anchor="w", pady=(8, 0))
+
+            # 命令列表
+            commands = [
+                # (分类, [(命令ID, 默认快捷键, 说明)])
+                ("文件操作", [
+                    ("CmdOpenFile", "Ctrl+O", "打开文件"),
+                    ("CmdSaveAs", "Ctrl+S", "另存为"),
+                    ("CmdClose", "Ctrl+W", "关闭文档"),
+                    ("CmdCloseCurrentDocument", "Q", "关闭当前文档"),
+                    ("CmdReloadDocument", "R", "重新加载"),
+                    ("CmdPrint", "Ctrl+P", "打印"),
+                    ("CmdProperties", "Ctrl+D", "文档属性"),
+                    ("CmdRenameFile", "F2", "重命名文件"),
+                    ("CmdNewWindow", "Ctrl+N", "新窗口"),
+                    ("CmdDuplicateInNewWindow", "Shift+Ctrl+N", "在新窗口打开"),
+                    ("CmdReopenLastClosedFile", "Shift+Ctrl+T", "恢复上次关闭的"),
+                    ("CmdExit", "Ctrl+Q", "退出"),
+                    ("CmdSelectAll", "Ctrl+A", "全选"),
+                    ("CmdCopySelection", "Ctrl+C", "复制选中"),
+                    ("CmdCommandPalette", "Ctrl+K", "命令面板"),
+                ]),
+                ("搜索", [
+                    ("CmdFindFirst", "Ctrl+F", "查找"),
+                    ("CmdFindNext", "F3", "查找下一个"),
+                    ("CmdFindPrev", "Shift+F3", "查找上一个"),
+                    ("CmdFindNextSel", "Ctrl+F3", "查找选中文字下一个"),
+                    ("CmdFindPrevSel", "Shift+Ctrl+F3", "查找选中文字上一个"),
+                ]),
+                ("页面视图", [
+                    ("CmdSinglePageView", "Ctrl+6", "单页视图"),
+                    ("CmdFacingView", "Ctrl+7", "双页视图"),
+                    ("CmdBookView", "Ctrl+8", "书籍视图"),
+                    ("CmdToggleContinuousView", "C", "切换连续滚动"),
+                    ("CmdToggleFullscreen", "F11", "全屏"),
+                    ("CmdTogglePresentationMode", "F5", "演示模式"),
+                    ("CmdToggleToolbar", "F8", "显示/隐藏工具栏"),
+                    ("CmdToggleMenuBar", "F9", "显示/隐藏菜单栏"),
+                    ("CmdInvertColors", "I", "反转颜色"),
+                    ("CmdRotateLeft", "[", "向左旋转"),
+                    ("CmdRotateRight", "]", "向右旋转"),
+                    ("CmdToggleMangaMode", "", "漫画模式"),
+                    ("CmdToggleLinks", "", "显示/隐藏链接框"),
+                ]),
+                ("页面导航", [
+                    ("CmdGoToNextPage", "N", "下一页"),
+                    ("CmdGoToPrevPage", "P", "上一页"),
+                    ("CmdGoToFirstPage", "Home", "第一页"),
+                    ("CmdGoToLastPage", "End", "最后一页"),
+                    ("CmdGoToPage", "G", "跳转到页"),
+                    ("CmdScrollUp", "K / ↑", "向上滚动"),
+                    ("CmdScrollDown", "J / ↓", "向下滚动"),
+                    ("CmdScrollLeft", "H / ←", "向左滚动"),
+                    ("CmdScrollRight", "L / →", "向右滚动"),
+                    ("CmdScrollUpPage", "PageUp", "向上翻页"),
+                    ("CmdScrollDownPage", "PageDown", "向下翻页"),
+                    ("CmdNavigateBack", "Alt+←", "后退"),
+                    ("CmdNavigateForward", "Alt+→", "前进"),
+                    ("CmdOpenNextFileInFolder", "Shift+Ctrl+→", "打开下一个文件"),
+                    ("CmdOpenPrevFileInFolder", "Shift+Ctrl+←", "打开上一个文件"),
+                ]),
+                ("标签页", [
+                    ("CmdNextTab", "Ctrl+PageUp", "下一个标签"),
+                    ("CmdPrevTab", "Ctrl+PageDown", "上一个标签"),
+                    ("CmdNextTabSmart", "Ctrl+Tab", "智能切换标签"),
+                    ("CmdPrevTabSmart", "Ctrl+Shift+Tab", "智能切换标签(反向)"),
+                    ("CmdMoveTabRight", "Ctrl+Shift+PageUp", "标签右移"),
+                    ("CmdMoveTabLeft", "Ctrl+Shift+PageDown", "标签左移"),
+                    ("CmdCloseAllTabs", "", "关闭所有标签"),
+                    ("CmdCloseOtherTabs", "", "关闭其他标签"),
+                    ("CmdCloseTabsToTheLeft", "", "关闭左侧标签"),
+                    ("CmdCloseTabsToTheRight", "", "关闭右侧标签"),
+                ]),
+                ("缩放", [
+                    ("CmdZoomIn", "Ctrl++", "放大"),
+                    ("CmdZoomOut", "Ctrl+-", "缩小"),
+                    ("CmdZoomFitPage", "Ctrl+0", "适合页面"),
+                    ("CmdZoomFitWidth", "Ctrl+2", "适合宽度"),
+                    ("CmdZoomFitContent", "Ctrl+3", "适合内容"),
+                    ("CmdZoomActualSize", "Ctrl+1", "实际大小"),
+                    ("CmdZoomCustom", "Ctrl+Y", "自定义缩放"),
+                    ("CmdToggleZoom", "Z", "切换缩放"),
+                ]),
+                ("收藏夹", [
+                    ("CmdFavoriteAdd", "Ctrl+B", "添加收藏"),
+                    ("CmdFavoriteDel", "", "删除收藏"),
+                    ("CmdFavoriteToggle", "", "显示/隐藏收藏夹"),
+                ]),
+                ("批注", [
+                    ("CmdCreateAnnotHighlight", "A", "高亮批注"),
+                    ("CmdCreateAnnotUnderline", "U", "下划线批注"),
+                    ("CmdCreateAnnotStrikeOut", "", "删除线批注"),
+                    ("CmdCreateAnnotSquiggly", "", "波浪线批注"),
+                    ("CmdCreateAnnotFreeText", "", "文本批注"),
+                    ("CmdCreateAnnotText", "", "便签批注"),
+                    ("CmdCreateAnnotStamp", "", "图章批注"),
+                    ("CmdCreateAnnotInk", "", "墨迹批注"),
+                    ("CmdCreateAnnotCircle", "", "圆形批注"),
+                    ("CmdCreateAnnotSquare", "", "矩形批注"),
+                    ("CmdCreateAnnotLine", "", "线条批注"),
+                    ("CmdCreateAnnotPolygon", "", "多边形批注"),
+                    ("CmdDeleteAnnotation", "Delete", "删除批注"),
+                    ("CmdSaveAnnotations", "Shift+Ctrl+S", "保存批注到PDF"),
+                ]),
+                ("外部应用", [
+                    ("CmdTranslateSelectionWithGoogle", "", "Google 翻译选中文字"),
+                    ("CmdTranslateSelectionWithDeepL", "", "DeepL 翻译选中文字"),
+                    ("CmdSearchSelectionWithGoogle", "", "Google 搜索选中文字"),
+                    ("CmdSearchSelectionWithBing", "", "Bing 搜索选中文字"),
+                    ("CmdSearchSelectionWithWikipedia", "", "Wikipedia 搜索"),
+                    ("CmdSearchSelectionWithGoogleScholar", "", "Google 学术搜索"),
+                    ("CmdOpenWithAcrobat", "", "用 Acrobat 打开"),
+                    ("CmdOpenWithFoxIt", "", "用 Foxit 打开"),
+                    ("CmdSendByEmail", "", "通过邮件发送"),
+                ]),
+                ("帮助与系统", [
+                    ("CmdHelpOpenManual", "F1", "打开手册"),
+                    ("CmdOptions", "", "选项"),
+                    ("CmdAdvancedOptions", "", "高级设置"),
+                    ("CmdCheckUpdate", "", "检查更新"),
+                    ("CmdChangeLanguage", "", "更改语言"),
+                ]),
+            ]
+
+            for group_name, cmds in commands:
+                group_frame = tk.Frame(page, bg=Colors.CARD_BG,
+                                       highlightbackground=Colors.BORDER, highlightthickness=1)
+                group_frame.pack(fill="x", padx=28, pady=(0, 8))
+                group_inner = tk.Frame(group_frame, bg=Colors.CARD_BG)
+                group_inner.pack(fill="x", padx=20, pady=12)
+
+                tk.Label(group_inner, text=group_name, font=Fonts.BODY_BOLD,
+                         bg=Colors.CARD_BG, fg=Colors.ACCENT).pack(anchor="w", pady=(0, 6))
+
+                for cmd_id, shortcut, desc in cmds:
+                    row = tk.Frame(group_inner, bg=Colors.CARD_BG)
+                    row.pack(fill="x", pady=1)
+                    tk.Label(row, text=cmd_id, font=("Consolas", 9),
+                             bg=Colors.CARD_BG, fg=Colors.TEXT_MUTED, width=32, anchor="w").pack(side="left")
+                    tk.Label(row, text=shortcut, font=Fonts.SMALL,
+                             bg=Colors.CARD_BG, fg=Colors.ACCENT, width=16, anchor="w").pack(side="left")
+                    tk.Label(row, text=desc, font=Fonts.SMALL,
+                             bg=Colors.CARD_BG, fg=Colors.TEXT_SECONDARY, anchor="w").pack(side="left")
+
+        elif page_type == "external":
+            tk.Label(page, text=(
+                "外部查看器是数组格式，需要手动编辑设置文件。\n\n"
+                "格式示例：\n\n"
+                "ExternalViewers [\n"
+                "  [\n"
+                '    CommandLine = "C:\\Path\\to\\viewer.exe" "%1"\n'
+                "    Name = 我的查看器\n"
+                "    Filter = *.pdf\n"
+                "    Key = Alt + 1\n"
+                "  ]\n"
+                "]"
+            ), font=("Consolas", 10), bg=Colors.BG, fg=Colors.TEXT_SECONDARY,
+                justify="left", wraplength=650).pack(pady=40, padx=28, anchor="w")
+
+        elif page_type == "selection":
+            tk.Label(page, text=(
+                "选中文字处理是数组格式，需要手动编辑设置文件。\n\n"
+                "格式示例：\n\n"
+                "SelectionHandlers [\n"
+                "  [\n"
+                "    URL = https://translate.google.com/?sl=auto&tl=zh-CN&text=${selection}\n"
+                "    Name = Google 翻译\n"
+                "    Key = Ctrl + T\n"
+                "  ]\n"
+                "]"
+            ), font=("Consolas", 10), bg=Colors.BG, fg=Colors.TEXT_SECONDARY,
+                justify="left", wraplength=650).pack(pady=40, padx=28, anchor="w")
 
     def _select_category(self, category: str, idx: int):
         # 更新侧边栏选中状态
