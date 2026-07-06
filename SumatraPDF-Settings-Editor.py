@@ -1043,7 +1043,52 @@ class SettingsEditor(tk.Tk):
 
             self._pages[cat] = (page, widgets)
 
+    def _create_checkbox(self, parent, var):
+        """创建一个大的自定义复选框，解决 Windows 上原生复选框太小的问题。"""
+        size = 22  # 复选框尺寸
+        frame = tk.Frame(parent, bg=Colors.CARD_BG, cursor="hand2")
+
+        canvas = tk.Canvas(frame, width=size, height=size, bg=Colors.CARD_BG,
+                           highlightthickness=0, bd=0)
+        canvas.pack(side="left", padx=(0, 8))
+
+        label = tk.Label(frame, text="启用", font=(Fonts.FAMILY, 12),
+                         bg=Colors.CARD_BG, fg=Colors.TEXT)
+        label.pack(side="left")
+
+        def _draw():
+            canvas.delete("all")
+            if var.get():
+                # 选中状态：蓝色填充 + 白色对勾
+                canvas.create_rectangle(1, 1, size - 1, size - 1,
+                                        fill=Colors.ACCENT, outline=Colors.ACCENT, width=1)
+                canvas.create_line(6, size // 2, size // 2 - 1, size - 6,
+                                   fill="white", width=2, capstyle="round")
+                canvas.create_line(size // 2 - 1, size - 6, size - 5, 5,
+                                   fill="white", width=2, capstyle="round")
+            else:
+                # 未选中状态：白色边框
+                canvas.create_rectangle(1, 1, size - 1, size - 1,
+                                        fill=Colors.CARD_BG, outline=Colors.INPUT_BORDER, width=1)
+
+        def _toggle(event=None):
+            var.set(not var.get())
+            _draw()
+
+        _draw()
+
+        # 点击任意位置切换
+        canvas.bind("<Button-1>", _toggle)
+        label.bind("<Button-1>", _toggle)
+        frame.bind("<Button-1>", _toggle)
+
+        # 监听变量变化
+        var.trace_add("write", lambda *args: _draw())
+
+        return frame
+
     def _build_array_category_page(self, page, page_type):
+
         """为数组类型的分类构建可视化编辑页面。"""
 
         if page_type == "shortcuts":
@@ -1383,14 +1428,12 @@ class SettingsEditor(tk.Tk):
         tk.Label(row_c, text="着色控件", font=Fonts.SMALL, bg=Colors.CARD_BG,
                  fg=Colors.TEXT_SECONDARY, width=14, anchor="w").pack(side="left")
         var_colorize = tk.BooleanVar(value=colorize.lower() == "true")
-        cb_font = (Fonts.FAMILY, 13)
-        tk.Checkbutton(row_c, text="  ColorizeControls（让菜单、工具栏等也使用主题颜色）",
-                       variable=var_colorize, font=cb_font,
-                       bg=Colors.CARD_BG, fg=Colors.TEXT,
-                       selectcolor=Colors.CARD_BG,
-                       activebackground=Colors.CARD_BG, activeforeground=Colors.TEXT,
-                       bd=0, highlightthickness=0, cursor="hand2",
-                       padx=8, pady=4).pack(side="left")
+        cb = self._create_checkbox(row_c, var_colorize)
+        # 修改标签文字
+        for child in cb.winfo_children():
+            if isinstance(child, tk.Label):
+                child.config(text="ColorizeControls（让菜单、工具栏等也使用主题颜色）")
+        cb.pack(side="left")
         fields["ColorizeControls"] = var_colorize
 
         # 预览色块
@@ -1615,13 +1658,7 @@ class SettingsEditor(tk.Tk):
 
         if stype == "bool":
             var = tk.BooleanVar(value=self.settings_file.get_bool(key))
-            # 用较大的字体让复选框更清晰可见
-            cb_font = (Fonts.FAMILY, 13)
-            cb = tk.Checkbutton(widget_frame, text="  启用", variable=var, font=cb_font,
-                                bg=Colors.CARD_BG, fg=Colors.TEXT, selectcolor=Colors.CARD_BG,
-                                activebackground=Colors.CARD_BG, activeforeground=Colors.TEXT,
-                                bd=0, highlightthickness=0, cursor="hand2",
-                                padx=8, pady=4)
+            cb = self._create_checkbox(widget_frame, var)
             cb.pack(side="left")
             widgets[key] = ("bool", var)
 
