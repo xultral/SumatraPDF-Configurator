@@ -2,6 +2,13 @@
 
 SumatraPDF 高级设置可视化编辑工具，替代手动编辑文本配置文件。
 
+> **基于 SumatraPDF 3.6 版本设置文档编写**
+>
+> 官方文档: https://www.sumatrapdfreader.org/settings/settings3-6
+>
+> ⚠️ SumatraPDF 的设置项可能随版本更新发生变化。如遇到新版本新增或修改的设置，
+> 请参考[最新官方文档](https://www.sumatrapdfreader.org/settings/settings)并更新本工具中的设置定义。
+
 ## 功能
 
 - **可视化编辑** — 图形界面修改 SumatraPDF 所有高级设置
@@ -90,3 +97,11 @@ python SumatraPDF-Settings-Editor.py "C:\Users\你的用户名\AppData\Local\Sum
 ## 许可证
 
 MIT License
+
+## 适配新版本
+
+当 SumatraPDF 发布新版本并更新设置时，需要修改 `SumatraPDF-Settings-Editor.py` 中的 `SETTINGS_META` 列表来添加或更新设置项。
+
+参考文档:
+- [最新设置文档](https://www.sumatrapdfreader.org/settings/settings)
+- [3.6 版本文档](https://www.sumatrapdfreader.org/settings/settings3-6)
