@@ -3,16 +3,11 @@
 SumatraPDF 高级设置编辑器
 =========================
 一个用于可视化编辑 SumatraPDF 高级设置文件 (SumatraPDF-settings.txt) 的 GUI 工具。
-替代手动编辑文本文件，提供直观的分类界面和适当的输入控件。
 
 需要: Python 3.8+ (tkinter 已包含在标准 Python 发行版中)
 
 用法:
     python SumatraPDF-Settings-Editor.py [设置文件路径]
-
-如果不指定路径，工具会自动检测设置文件位置:
-  - 安装版: %LOCALAPPDATA%\\SumatraPDF\\SumatraPDF-settings.txt
-  - 便携版: 与 SumatraPDF.exe 同目录
 """
 
 import os
@@ -23,18 +18,57 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, colorchooser
 from typing import Any, Optional
 
-# 高 DPI 支持 - 让界面在高分屏上清晰显示
+# 高 DPI 支持
 try:
     ctypes.windll.shcore.SetProcessDpiAwareness(1)
 except Exception:
     pass
 
 # ──────────────────────────────────────────────────────────────────────
-# 设置元数据: 定义每个已知设置的类型、默认值、描述和所属分类
+# 颜色常量 - 现代化配色
 # ──────────────────────────────────────────────────────────────────────
+class Colors:
+    BG = "#f8f9fa"              # 主背景
+    SIDEBAR_BG = "#ffffff"      # 侧边栏背景
+    CARD_BG = "#ffffff"         # 卡片背景
+    BORDER = "#e2e8f0"          # 边框
+    TEXT = "#1a202c"            # 主文字
+    TEXT_SECONDARY = "#4a5568"  # 次要文字
+    TEXT_MUTED = "#a0aec0"      # 弱化文字
+    ACCENT = "#4f6bed"          # 强调色
+    ACCENT_LIGHT = "#eef2ff"    # 强调色浅
+    HOVER = "#f1f5f9"           # 悬停
+    SELECTED_BG = "#4f6bed"     # 选中背景
+    SELECTED_FG = "#ffffff"     # 选中文字
+    SEPARATOR = "#edf2f7"       # 分隔线
+    INPUT_BG = "#ffffff"        # 输入框背景
+    INPUT_BORDER = "#cbd5e0"    # 输入框边框
+    INPUT_FOCUS = "#4f6bed"     # 输入框聚焦边框
 
-# 设置类型: "bool", "int", "float", "str", "color", "choice", "compact"
-# "compact" = 空格分隔的多值，如 "2 4 2 4"
+# ──────────────────────────────────────────────────────────────────────
+# 字体常量
+# ──────────────────────────────────────────────────────────────────────
+class Fonts:
+    # 优先使用微软雅黑，回退到 Segoe UI
+    FAMILY = "Microsoft YaHei UI"
+    FAMILY_MONO = "Consolas"
+
+    TITLE = (FAMILY, 18, "bold")
+    SUBTITLE = (FAMILY, 14, "bold")
+    BODY = (FAMILY, 11)
+    BODY_BOLD = (FAMILY, 11, "bold")
+    SMALL = (FAMILY, 10)
+    SMALL_MUTED = (FAMILY, 10)
+    SIDEBAR = (FAMILY, 11)
+    SIDEBAR_TITLE = (FAMILY, 13, "bold")
+    KEY = (FAMILY_MONO, 10)
+    INPUT = (FAMILY, 11)
+    BUTTON = (FAMILY, 10)
+    STATUS = (FAMILY, 10)
+
+# ──────────────────────────────────────────────────────────────────────
+# 设置元数据
+# ──────────────────────────────────────────────────────────────────────
 
 CATEGORIES = [
     "常规",
@@ -56,8 +90,6 @@ CATEGORIES = [
     "专家 / 内部",
 ]
 
-# 每条记录: (配置键, 类型, 默认值, 中文描述, 分类, 选项列表或None)
-# 嵌套设置使用点号表示: "FixedPageUI.TextColor"
 SETTINGS_META = [
     # ── 常规 ──
     ("CheckForUpdates", "bool", True,
@@ -339,77 +371,52 @@ SETTINGS_META = [
      "专家 / 内部", None),
 ]
 
-# 构建快速查找字典
 SETTINGS_LOOKUP = {s[0]: s for s in SETTINGS_META}
 
 
 # ──────────────────────────────────────────────────────────────────────
-# 设置文件解析器 / 写入器
+# 设置文件解析器
 # ──────────────────────────────────────────────────────────────────────
 
 class SettingsFile:
-    """解析和写入 SumatraPDF-settings.txt，保留注释和结构。"""
-
     def __init__(self):
         self.path: Optional[str] = None
-        self.raw_lines: list[str] = []
-        self.settings: dict[str, str] = {}  # 键 -> 值（字符串）
-        self.structs: dict[str, dict[str, str]] = {}  # "结构名" -> {字段: 值}
-        self._parse_tree: list = []  # 保留结构用于往返保存
+        self.settings: dict[str, str] = {}
+        self.structs: dict[str, dict[str, str]] = {}
+        self._parse_tree: list = []
 
     def find_settings_file(self) -> Optional[str]:
-        """自动检测设置文件位置。"""
         candidates = []
-
-        # 1. 安装版: %LOCALAPPDATA%\SumatraPDF
         local_app_data = os.environ.get("LOCALAPPDATA")
         if local_app_data:
             p = os.path.join(local_app_data, "SumatraPDF", "SumatraPDF-settings.txt")
             if os.path.isfile(p):
                 candidates.append(p)
-
-        # 2. 便携版: 与此脚本同目录或上级目录
         script_dir = os.path.dirname(os.path.abspath(__file__))
         for d in [script_dir, os.path.dirname(script_dir)]:
             p = os.path.join(d, "SumatraPDF-settings.txt")
             if os.path.isfile(p):
                 candidates.append(p)
-
-        # 3. SumatraPDF.exe 旁边
-        for d in [script_dir, os.path.dirname(script_dir)]:
-            exe = os.path.join(d, "SumatraPDF.exe")
-            if os.path.isfile(exe):
-                p = os.path.join(d, "SumatraPDF-settings.txt")
-                if os.path.isfile(p) and p not in candidates:
-                    candidates.append(p)
-
         return candidates[0] if candidates else None
 
     def load(self, path: str):
-        """加载并解析设置文件。"""
         self.path = path
         with open(path, "r", encoding="utf-8") as f:
-            self.raw_lines = f.readlines()
-
+            lines = f.readlines()
         self.settings.clear()
         self.structs.clear()
-        self._parse_tree = self._parse_lines(self.raw_lines)
+        self._parse_tree = self._parse_lines(lines)
 
     def _parse_lines(self, lines: list[str]) -> list:
-        """将文本行解析为保留顺序的树结构。"""
         result = []
         i = 0
         while i < len(lines):
             line = lines[i].rstrip("\r\n")
             stripped = line.strip()
-
-            # 注释或空行
             if not stripped or stripped.startswith(";"):
                 result.append(("comment", stripped))
                 i += 1
                 continue
-
-            # 结构体: Name [
             struct_match = re.match(r'^(\w+)\s*\[', stripped)
             if struct_match and not stripped.startswith("["):
                 name = struct_match.group(1)
@@ -423,20 +430,13 @@ class SettingsFile:
                         if depth == 0:
                             i += 1
                             break
-                    elif sl == "[":
+                    elif sl == "[" or sl.startswith("["):
                         depth += 1
                         i += 1
                         continue
-                    elif sl.startswith("["):
-                        depth += 1
-                        i += 1
-                        continue
-
                     if not sl or sl.startswith(";"):
                         i += 1
                         continue
-
-                    # 结构体内的键值对
                     kv = re.match(r'^(\w+)\s*=\s*(.*)', sl)
                     if kv:
                         key, val = kv.group(1), kv.group(2).strip()
@@ -444,7 +444,6 @@ class SettingsFile:
                         items.append(("kv", key, val))
                         i += 1
                     elif re.match(r'^(\w+)\s*\[', sl):
-                        # 嵌套结构体
                         sub_match = re.match(r'^(\w+)\s*\[', sl)
                         sub_name = sub_match.group(1)
                         i += 1
@@ -473,11 +472,8 @@ class SettingsFile:
                         items.append(("struct", sub_name, sub_items))
                     else:
                         i += 1
-
                 result.append(("struct", name, items))
                 continue
-
-            # 顶层键值对
             kv = re.match(r'^(\w+)\s*=\s*(.*)', stripped)
             if kv:
                 key, val = kv.group(1), kv.group(2).strip()
@@ -485,13 +481,10 @@ class SettingsFile:
                 result.append(("kv", key, val))
                 i += 1
                 continue
-
             i += 1
-
         return result
 
     def _set_nested(self, struct_name: str, key: str, val: str):
-        """设置嵌套结构体中的值，如 FixedPageUI.TextColor。"""
         full_key = f"{struct_name}.{key}"
         self.settings[full_key] = val
         if struct_name not in self.structs:
@@ -499,28 +492,12 @@ class SettingsFile:
         self.structs[struct_name][key] = val
 
     def get(self, key: str) -> str:
-        """通过点号键获取设置值。"""
         return self.settings.get(key, "")
 
     def get_bool(self, key: str) -> bool:
         return self.get(key).lower() in ("true", "1")
 
-    def get_int(self, key: str) -> int:
-        try:
-            return int(self.get(key))
-        except (ValueError, TypeError):
-            meta = SETTINGS_LOOKUP.get(key)
-            return meta[2] if meta else 0
-
-    def get_float(self, key: str) -> float:
-        try:
-            return float(self.get(key))
-        except (ValueError, TypeError):
-            meta = SETTINGS_LOOKUP.get(key)
-            return meta[2] if meta else 0.0
-
     def set_value(self, key: str, value: str):
-        """设置一个配置值。"""
         self.settings[key] = value
         if "." in key:
             parts = key.split(".", 1)
@@ -530,17 +507,14 @@ class SettingsFile:
             self.structs[struct_name][field] = value
 
     def save(self, path: Optional[str] = None):
-        """将设置文件写回，保留注释和结构。"""
         save_path = path or self.path
         if not save_path:
             raise ValueError("未指定保存路径")
-
         output_lines = self._rebuild_lines()
         with open(save_path, "w", encoding="utf-8") as f:
             f.writelines(output_lines)
 
     def _rebuild_lines(self) -> list[str]:
-        """从解析树和当前值重建设置文件。"""
         lines = []
         for entry in self._parse_tree:
             if entry[0] == "comment":
@@ -569,49 +543,49 @@ class SettingsFile:
                                 lines.append(f"        {sk} = {val}\n")
                         lines.append(f"    ]\n")
                 lines.append(f"]\n")
-
         return lines
 
 
 # ──────────────────────────────────────────────────────────────────────
-# GUI 应用程序
+# 颜色选择按钮
 # ──────────────────────────────────────────────────────────────────────
 
 class ColorButton(tk.Frame):
-    """显示颜色并点击打开颜色选择器的按钮。"""
-
     def __init__(self, parent, color_str: str = "", **kwargs):
-        super().__init__(parent, **kwargs)
+        super().__init__(parent, bg=Colors.CARD_BG, **kwargs)
         self.color_str = color_str
         self._display_color = self._parse_display_color(color_str)
 
-        self.swatch = tk.Canvas(self, width=28, height=28, bd=1, relief="raised",
-                                highlightthickness=0)
-        self.swatch.pack(side="left", padx=(0, 6))
+        self.swatch = tk.Canvas(self, width=32, height=32, bd=0, highlightthickness=0,
+                                bg=Colors.CARD_BG)
+        self.swatch.pack(side="left", padx=(0, 8))
         self._draw_swatch()
 
-        self.label = tk.Label(self, text=color_str or "（默认）", font=("", 11))
+        self.label = tk.Label(self, text=color_str or "（默认）", font=Fonts.BODY,
+                              bg=Colors.CARD_BG, fg=Colors.TEXT)
         self.label.pack(side="left")
 
-        self.btn = tk.Button(self, text="选择...", width=6, font=("", 10),
-                             command=self._pick_color)
-        self.btn.pack(side="left", padx=4)
+        self.btn = tk.Button(self, text="选择颜色", font=Fonts.BUTTON,
+                             bg=Colors.ACCENT, fg="white", bd=0, padx=12, pady=4,
+                             activebackground="#3d5bd9", activeforeground="white",
+                             cursor="hand2", command=self._pick_color)
+        self.btn.pack(side="left", padx=(12, 4))
 
-        self.clear_btn = tk.Button(self, text="清除", width=4, font=("", 10),
-                                   command=self._clear_color)
+        self.clear_btn = tk.Button(self, text="清除", font=Fonts.BUTTON,
+                                   bg=Colors.HOVER, fg=Colors.TEXT_SECONDARY, bd=0, padx=8, pady=4,
+                                   activebackground=Colors.BORDER, activeforeground=Colors.TEXT,
+                                   cursor="hand2", command=self._clear_color)
         self.clear_btn.pack(side="left")
 
         self.swatch.bind("<Button-1>", lambda e: self._pick_color())
 
     def _parse_display_color(self, s: str) -> str:
-        """将 SumatraPDF 颜色转换为 tkinter 颜色。"""
         if not s:
             return ""
         s = s.lstrip("#")
         if len(s) == 6:
             return f"#{s}"
         elif len(s) == 8:
-            # aarrggbb -> rrggbb（显示时忽略 alpha）
             return f"#{s[2:]}"
         return f"#{s}" if s else ""
 
@@ -619,18 +593,20 @@ class ColorButton(tk.Frame):
         self.swatch.delete("all")
         if self._display_color:
             try:
-                self.swatch.create_rectangle(0, 0, 28, 28, fill=self._display_color, outline="#888")
+                self.swatch.create_rectangle(2, 2, 30, 30, fill=self._display_color,
+                                             outline=Colors.BORDER, width=1)
             except tk.TclError:
-                self.swatch.create_rectangle(0, 0, 28, 28, fill="#cccccc", outline="#888")
+                self.swatch.create_rectangle(2, 2, 30, 30, fill="#cccccc",
+                                             outline=Colors.BORDER, width=1)
         else:
-            self.swatch.create_rectangle(0, 0, 28, 28, fill="#cccccc", outline="#888",
-                                         stipple="gray50")
+            self.swatch.create_rectangle(2, 2, 30, 30, fill="#f0f0f0",
+                                         outline=Colors.BORDER, width=1, stipple="gray50")
 
     def _pick_color(self):
         initial = self._display_color or "#ffffff"
         result = colorchooser.askcolor(initialcolor=initial, title="选择颜色")
         if result and result[1]:
-            hex_color = result[1]  # #rrggbb
+            hex_color = result[1]
             self.color_str = hex_color
             self._display_color = hex_color
             self.label.config(text=hex_color)
@@ -652,31 +628,24 @@ class ColorButton(tk.Frame):
         self._draw_swatch()
 
 
-class SettingsEditor(tk.Tk):
-    """主应用程序窗口。"""
+# ──────────────────────────────────────────────────────────────────────
+# 主应用程序
+# ──────────────────────────────────────────────────────────────────────
 
+class SettingsEditor(tk.Tk):
     def __init__(self, settings_path: Optional[str] = None):
         super().__init__()
 
         self.title("SumatraPDF 高级设置编辑器")
-        self.geometry("1060x780")
-        self.minsize(900, 650)
+        self.geometry("1100x800")
+        self.minsize(950, 650)
+        self.configure(bg=Colors.BG)
 
-        # 全局 ttk 样式 - 统一字体大小
-        style = ttk.Style()
-        style.configure(".", font=("", 10))
-        style.configure("TLabel", font=("", 10))
-        style.configure("TButton", font=("", 10))
-        style.configure("TCheckbutton", font=("", 10))
-        style.configure("TCombobox", font=("", 10))
-        style.configure("TEntry", font=("", 10))
-
-        # 设置数据
         self.settings_file = SettingsFile()
-        self.widgets: dict[str, Any] = {}  # 键 -> 控件
+        self.widgets: dict[str, Any] = {}
         self.current_category = None
+        self._sidebar_buttons: list[tk.Button] = []
 
-        # 尝试加载设置
         if settings_path:
             self._load_file(settings_path)
         else:
@@ -691,183 +660,228 @@ class SettingsEditor(tk.Tk):
     def _load_file(self, path: str):
         try:
             self.settings_file.load(path)
-            self.title(f"SumatraPDF 高级设置编辑器 - {path}")
+            self.title(f"SumatraPDF 高级设置编辑器 — {path}")
         except Exception as e:
             messagebox.showerror("错误", f"加载设置文件失败:\n{e}")
 
     def _build_ui(self):
-        # 菜单栏
-        menubar = tk.Menu(self)
-        file_menu = tk.Menu(menubar, tearoff=0)
-        file_menu.add_command(label="打开(O)...", command=self._open_file, accelerator="Ctrl+O")
-        file_menu.add_command(label="保存(S)", command=self._save_file, accelerator="Ctrl+S")
-        file_menu.add_command(label="另存为(A)...", command=self._save_as_file)
-        file_menu.add_separator()
-        file_menu.add_command(label="恢复默认值", command=self._reset_defaults)
-        file_menu.add_separator()
-        file_menu.add_command(label="退出", command=self.quit)
-        menubar.add_cascade(label="文件", menu=file_menu)
+        # 顶部工具栏
+        toolbar = tk.Frame(self, bg=Colors.CARD_BG, height=52)
+        toolbar.pack(fill="x")
+        toolbar.pack_propagate(False)
 
-        help_menu = tk.Menu(menubar, tearoff=0)
-        help_menu.add_command(label="关于", command=self._show_about)
-        menubar.add_cascade(label="帮助", menu=help_menu)
+        # Logo / 标题
+        tk.Label(toolbar, text="⚙  SumatraPDF 设置编辑器", font=Fonts.SUBTITLE,
+                 bg=Colors.CARD_BG, fg=Colors.TEXT).pack(side="left", padx=20)
 
-        self.config(menu=menubar)
+        # 文件路径
+        self.path_var = tk.StringVar(value=self.settings_file.path or "未加载文件")
+        tk.Label(toolbar, textvariable=self.path_var, font=Fonts.SMALL,
+                 bg=Colors.CARD_BG, fg=Colors.TEXT_MUTED).pack(side="left", padx=20)
 
-        # 快捷键
-        self.bind("<Control-o>", lambda e: self._open_file())
-        self.bind("<Control-s>", lambda e: self._save_file())
+        # 按钮
+        btn_frame = tk.Frame(toolbar, bg=Colors.CARD_BG)
+        btn_frame.pack(side="right", padx=16)
 
-        # 主布局: 侧边栏 + 内容区
-        main_frame = ttk.Frame(self)
-        main_frame.pack(fill="both", expand=True, padx=4, pady=4)
+        self._make_toolbar_button(btn_frame, "打开文件", self._open_file)
+        self._make_toolbar_button(btn_frame, "保存", self._save_file, primary=True)
 
-        # 分类侧边栏
-        sidebar = ttk.Frame(main_frame, width=220)
-        sidebar.pack(side="left", fill="y", padx=(0, 6))
+        # 分隔线
+        tk.Frame(self, height=1, bg=Colors.BORDER).pack(fill="x")
 
-        ttk.Label(sidebar, text="设置分类", font=("", 13, "bold")).pack(pady=(0, 6))
+        # 主体
+        body = tk.Frame(self, bg=Colors.BG)
+        body.pack(fill="both", expand=True)
 
-        self.category_listbox = tk.Listbox(sidebar, font=("", 11), activestyle="none",
-                                            exportselection=False,
-                                            selectbackground="#0078d4",
-                                            selectforeground="white")
-        self.category_listbox.pack(fill="both", expand=True)
-        for cat in CATEGORIES:
-            self.category_listbox.insert("end", f"  {cat}")
-        self.category_listbox.bind("<<ListboxSelect>>", self._on_category_select)
+        # 左侧边栏
+        sidebar_outer = tk.Frame(body, bg=Colors.SIDEBAR_BG, width=220)
+        sidebar_outer.pack(side="left", fill="y")
+        sidebar_outer.pack_propagate(False)
 
-        # 内容区（带滚动条）
-        content_outer = ttk.Frame(main_frame)
+        sidebar_header = tk.Frame(sidebar_outer, bg=Colors.SIDEBAR_BG)
+        sidebar_header.pack(fill="x", padx=16, pady=(16, 8))
+        tk.Label(sidebar_header, text="设置分类", font=Fonts.SIDEBAR_TITLE,
+                 bg=Colors.SIDEBAR_BG, fg=Colors.TEXT).pack(anchor="w")
+
+        # 分隔线
+        tk.Frame(sidebar_outer, height=1, bg=Colors.BORDER).pack(fill="x", padx=16)
+
+        # 分类按钮列表（可滚动）
+        sidebar_canvas = tk.Canvas(sidebar_outer, bg=Colors.SIDEBAR_BG,
+                                   highlightthickness=0, bd=0)
+        sidebar_scrollbar = ttk.Scrollbar(sidebar_outer, orient="vertical",
+                                          command=sidebar_canvas.yview)
+        sidebar_inner = tk.Frame(sidebar_canvas, bg=Colors.SIDEBAR_BG)
+
+        sidebar_inner.bind("<Configure>",
+                           lambda e: sidebar_canvas.configure(scrollregion=sidebar_canvas.bbox("all")))
+        sidebar_canvas.create_window((0, 0), window=sidebar_inner, anchor="nw", tags="inner")
+        sidebar_canvas.configure(yscrollcommand=sidebar_scrollbar.set)
+
+        sidebar_canvas.pack(side="left", fill="both", expand=True)
+        sidebar_scrollbar.pack(side="right", fill="y")
+
+        # 让 canvas 内窗口宽度跟随 canvas
+        def _resize_sidebar_inner(event):
+            sidebar_canvas.itemconfig("inner", width=event.width)
+        sidebar_canvas.bind("<Configure>", _resize_sidebar_inner)
+
+        # 创建分类按钮
+        for i, cat in enumerate(CATEGORIES):
+            btn = tk.Button(sidebar_inner, text=f"  {cat}", font=Fonts.SIDEBAR,
+                            bg=Colors.SIDEBAR_BG, fg=Colors.TEXT_SECONDARY,
+                            bd=0, anchor="w", padx=16, pady=10,
+                            activebackground=Colors.HOVER, activeforeground=Colors.TEXT,
+                            cursor="hand2",
+                            command=lambda c=cat, idx=i: self._select_category(c, idx))
+            btn.pack(fill="x")
+            btn.bind("<Enter>", lambda e, b=btn: b.configure(bg=Colors.HOVER)
+                     if b.cget("bg") != Colors.ACCENT_LIGHT else None)
+            btn.bind("<Leave>", lambda e, b=btn: b.configure(bg=Colors.SIDEBAR_BG)
+                     if b.cget("bg") != Colors.ACCENT_LIGHT else None)
+            self._sidebar_buttons.append(btn)
+
+        # 右侧内容区
+        content_outer = tk.Frame(body, bg=Colors.BG)
         content_outer.pack(side="left", fill="both", expand=True)
 
-        # 顶部文件路径栏
-        top_bar = ttk.Frame(content_outer)
-        top_bar.pack(fill="x", pady=(0, 4))
-
-        self.path_var = tk.StringVar(value=self.settings_file.path or "（未加载文件）")
-        ttk.Label(top_bar, text="文件:", font=("", 10)).pack(side="left")
-        ttk.Label(top_bar, textvariable=self.path_var, foreground="#333", font=("", 10)).pack(
-            side="left", padx=4, fill="x", expand=True)
-
-        btn_frame = ttk.Frame(top_bar)
-        btn_frame.pack(side="right")
-        ttk.Button(btn_frame, text="打开", command=self._open_file, width=6).pack(side="left", padx=2)
-        ttk.Button(btn_frame, text="保存", command=self._save_file, width=6).pack(side="left", padx=2)
-
-        # 可滚动的内容区
-        canvas_frame = ttk.Frame(content_outer)
-        canvas_frame.pack(fill="both", expand=True)
-
-        self.canvas = tk.Canvas(canvas_frame, highlightthickness=0)
-        scrollbar = ttk.Scrollbar(canvas_frame, orient="vertical", command=self.canvas.yview)
-        self.scrollable_frame = ttk.Frame(self.canvas, padding=(12, 4))
+        # 内容滚动区
+        self.canvas = tk.Canvas(content_outer, bg=Colors.BG, highlightthickness=0, bd=0)
+        scrollbar = ttk.Scrollbar(content_outer, orient="vertical", command=self.canvas.yview)
+        self.scrollable_frame = tk.Frame(self.canvas, bg=Colors.BG)
 
         self.scrollable_frame.bind(
             "<Configure>",
             lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         )
+        self.canvas_window = self.canvas.create_window((0, 0), window=self.scrollable_frame,
+                                                        anchor="nw", tags="content")
 
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
         self.canvas.configure(yscrollcommand=scrollbar.set)
-
-        self.canvas.pack(side="left", fill="both", expand=True)
+        self.canvas.pack(side="left", fill="both", expand=True, padx=(1, 0))
         scrollbar.pack(side="right", fill="y")
 
-        # 鼠标滚轮滚动（仅在鼠标位于内容区时生效）
+        # 内容区宽度跟随
+        def _resize_content(event):
+            self.canvas.itemconfig("content", width=event.width)
+        self.canvas.bind("<Configure>", _resize_content)
+
+        # 鼠标滚轮
         def _on_mousewheel(event):
-            widget = self.winfo_containing(event.x_root, event.y_root)
-            if widget and (widget == self.canvas or widget.master == self.canvas
-                           or str(widget).startswith(str(self.scrollable_frame))):
-                self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+            self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+        self.canvas.bind_all("<MouseWheel>", _on_mousewheel)
 
-        self.bind("<MouseWheel>", _on_mousewheel)
-
-        # 状态栏
-        self.status_var = tk.StringVar(value="就绪")
-        status_bar = ttk.Label(self, textvariable=self.status_var, relief="sunken", anchor="w",
-                               font=("", 10))
+        # 底部状态栏
+        status_bar = tk.Frame(self, bg=Colors.CARD_BG, height=32)
         status_bar.pack(fill="x", side="bottom")
+        status_bar.pack_propagate(False)
+        self.status_var = tk.StringVar(value="就绪")
+        tk.Label(status_bar, textvariable=self.status_var, font=Fonts.STATUS,
+                 bg=Colors.CARD_BG, fg=Colors.TEXT_MUTED).pack(side="left", padx=16)
+
+        # 快捷键
+        self.bind("<Control-o>", lambda e: self._open_file())
+        self.bind("<Control-s>", lambda e: self._save_file())
 
         # 选中第一个分类
-        self.category_listbox.selection_set(0)
-        self._show_category(CATEGORIES[0])
+        self._select_category(CATEGORIES[0], 0)
 
-    def _on_category_select(self, event):
-        sel = self.category_listbox.curselection()
-        if sel:
-            idx = sel[0]
-            cat = CATEGORIES[idx]
-            self._show_category(cat)
+    def _make_toolbar_button(self, parent, text, command, primary=False):
+        if primary:
+            btn = tk.Button(parent, text=text, font=Fonts.BUTTON,
+                            bg=Colors.ACCENT, fg="white", bd=0, padx=16, pady=6,
+                            activebackground="#3d5bd9", activeforeground="white",
+                            cursor="hand2", command=command)
+        else:
+            btn = tk.Button(parent, text=text, font=Fonts.BUTTON,
+                            bg=Colors.HOVER, fg=Colors.TEXT, bd=0, padx=16, pady=6,
+                            activebackground=Colors.BORDER, activeforeground=Colors.TEXT,
+                            cursor="hand2", command=command)
+        btn.pack(side="left", padx=4)
+        return btn
+
+    def _select_category(self, category: str, idx: int):
+        # 更新侧边栏选中状态
+        for i, btn in enumerate(self._sidebar_buttons):
+            if i == idx:
+                btn.configure(bg=Colors.ACCENT_LIGHT, fg=Colors.ACCENT)
+            else:
+                btn.configure(bg=Colors.SIDEBAR_BG, fg=Colors.TEXT_SECONDARY)
+
+        self.current_category = category
+        self._show_category(category)
 
     def _show_category(self, category: str):
-        """显示所选分类的设置项。"""
-        # 清除当前内容
         for widget in self.scrollable_frame.winfo_children():
             widget.destroy()
         self.widgets.clear()
 
-        self.current_category = category
+        # 分类标题
+        header = tk.Frame(self.scrollable_frame, bg=Colors.BG)
+        header.pack(fill="x", padx=28, pady=(24, 16))
+        tk.Label(header, text=category, font=Fonts.TITLE,
+                 bg=Colors.BG, fg=Colors.TEXT).pack(anchor="w")
 
-        # 标题
-        ttk.Label(self.scrollable_frame, text=category, font=("", 16, "bold")).pack(
-            pady=(10, 14), anchor="w")
-
-        # 获取此分类的设置项
         cat_settings = [s for s in SETTINGS_META if s[4] == category]
-
         if not cat_settings:
-            ttk.Label(self.scrollable_frame, text="（此分类没有可编辑的设置项）",
-                      foreground="#666", font=("", 11)).pack(pady=20)
+            tk.Label(self.scrollable_frame, text="此分类没有可编辑的设置项",
+                     font=Fonts.BODY, bg=Colors.BG, fg=Colors.TEXT_MUTED).pack(pady=40)
             return
 
-        # 构建设置项列表
+        # 设置卡片容器
         for meta in cat_settings:
             key, stype, default, desc, cat, options = meta
-            self._add_setting_row(key, stype, default, desc, options)
+            self._add_setting_card(key, stype, default, desc, options)
 
-    def _add_setting_row(self, key: str, stype: str, default: Any, desc: str, options):
-        """在当前分类视图中添加单个设置行。"""
+    def _add_setting_card(self, key: str, stype: str, default: Any, desc: str, options):
         current = self.settings_file.get(key)
 
-        # 设置项框架
-        row_frame = ttk.Frame(self.scrollable_frame, padding=(8, 6))
-        row_frame.pack(fill="x", padx=4, pady=4)
+        # 卡片
+        card = tk.Frame(self.scrollable_frame, bg=Colors.CARD_BG,
+                        highlightbackground=Colors.BORDER, highlightthickness=1)
+        card.pack(fill="x", padx=28, pady=(0, 8))
 
-        # 描述标签
-        desc_label = ttk.Label(row_frame, text=desc, font=("", 11), foreground="#222",
-                               wraplength=700)
-        desc_label.pack(anchor="w")
+        inner = tk.Frame(card, bg=Colors.CARD_BG)
+        inner.pack(fill="x", padx=20, pady=16)
 
-        # 配置键标签
-        key_label = ttk.Label(row_frame, text=key, font=("Consolas", 10), foreground="#555")
-        key_label.pack(anchor="w", pady=(0, 4))
+        # 上方：描述 + 配置键
+        top = tk.Frame(inner, bg=Colors.CARD_BG)
+        top.pack(fill="x", pady=(0, 12))
 
-        # 控件框架
-        widget_frame = ttk.Frame(row_frame)
-        widget_frame.pack(fill="x", pady=(0, 8))
+        tk.Label(top, text=desc, font=Fonts.BODY, bg=Colors.CARD_BG,
+                 fg=Colors.TEXT, wraplength=650, anchor="w", justify="left").pack(anchor="w")
+        tk.Label(top, text=key, font=Fonts.KEY, bg=Colors.CARD_BG,
+                 fg=Colors.TEXT_MUTED).pack(anchor="w", pady=(4, 0))
+
+        # 下方：控件
+        widget_frame = tk.Frame(inner, bg=Colors.CARD_BG)
+        widget_frame.pack(fill="x")
 
         if stype == "bool":
             var = tk.BooleanVar(value=self.settings_file.get_bool(key))
-            cb = ttk.Checkbutton(widget_frame, text="启用", variable=var)
+            # 自定义样式的复选框
+            cb_frame = tk.Frame(widget_frame, bg=Colors.CARD_BG)
+            cb_frame.pack(side="left")
+            cb = tk.Checkbutton(cb_frame, text="启用", variable=var, font=Fonts.BODY,
+                                bg=Colors.CARD_BG, fg=Colors.TEXT, selectcolor=Colors.CARD_BG,
+                                activebackground=Colors.CARD_BG, activeforeground=Colors.TEXT,
+                                bd=0, highlightthickness=0, cursor="hand2")
             cb.pack(side="left")
             self.widgets[key] = ("bool", var)
 
         elif stype == "int":
             var = tk.StringVar(value=current if current else str(default))
-            entry = ttk.Entry(widget_frame, textvariable=var, width=15, font=("", 11))
-            entry.pack(side="left")
+            entry = self._make_entry(widget_frame, var)
             self.widgets[key] = ("str", var)
 
         elif stype == "float":
             var = tk.StringVar(value=current if current else str(default))
-            entry = ttk.Entry(widget_frame, textvariable=var, width=15, font=("", 11))
-            entry.pack(side="left")
+            entry = self._make_entry(widget_frame, var)
             self.widgets[key] = ("str", var)
 
         elif stype == "str":
             var = tk.StringVar(value=current)
-            entry = ttk.Entry(widget_frame, textvariable=var, width=50, font=("", 11))
+            entry = self._make_entry(widget_frame, var, width=50)
             entry.pack(side="left", fill="x", expand=True)
             self.widgets[key] = ("str", var)
 
@@ -879,23 +893,29 @@ class SettingsEditor(tk.Tk):
         elif stype == "choice":
             var = tk.StringVar(value=current if current else str(default))
             combo = ttk.Combobox(widget_frame, textvariable=var, values=options,
-                                 state="readonly", width=25, font=("", 11))
+                                 state="readonly", width=28, font=Fonts.INPUT)
             combo.pack(side="left")
             self.widgets[key] = ("str", var)
 
         elif stype == "compact":
             var = tk.StringVar(value=current if current else str(default))
-            entry = ttk.Entry(widget_frame, textvariable=var, width=30, font=("", 11))
-            entry.pack(side="left")
-            ttk.Label(widget_frame, text="（空格分隔的多个值）",
-                      foreground="#666", font=("", 10)).pack(side="left", padx=8)
+            entry = self._make_entry(widget_frame, var, width=30)
+            tk.Label(widget_frame, text="空格分隔多个值", font=Fonts.SMALL_MUTED,
+                     bg=Colors.CARD_BG, fg=Colors.TEXT_MUTED).pack(side="left", padx=12)
             self.widgets[key] = ("str", var)
 
-        # 分隔线
-        ttk.Separator(self.scrollable_frame, orient="horizontal").pack(fill="x", padx=8, pady=(0, 2))
+    def _make_entry(self, parent, var, width=20):
+        entry_frame = tk.Frame(parent, bg=Colors.INPUT_BORDER, padx=1, pady=1)
+        entry_frame.pack(side="left")
+        entry = tk.Entry(entry_frame, textvariable=var, font=Fonts.INPUT, width=width,
+                         bg=Colors.INPUT_BG, fg=Colors.TEXT,
+                         insertbackground=Colors.TEXT, bd=0,
+                         highlightthickness=1, highlightcolor=Colors.INPUT_FOCUS,
+                         highlightbackground=Colors.INPUT_BORDER)
+        entry.pack(fill="x", padx=2, pady=2)
+        return entry
 
     def _collect_values(self):
-        """从控件收集所有值写回设置文件。"""
         for key, (wtype, widget) in self.widgets.items():
             if wtype == "bool":
                 val = "true" if widget.get() else "false"
@@ -917,64 +937,19 @@ class SettingsEditor(tk.Tk):
             self._load_file(path)
             self.path_var.set(path)
             if self.current_category:
-                self._show_category(self.current_category)
+                idx = CATEGORIES.index(self.current_category) if self.current_category in CATEGORIES else 0
+                self._select_category(self.current_category, idx)
 
     def _save_file(self):
         self._collect_values()
         try:
             self.settings_file.save()
-            self.status_var.set(f"已保存到 {self.settings_file.path}")
-            messagebox.showinfo("保存成功",
-                                f"设置已保存。\n\n"
-                                f"部分更改可能需要重启 SumatraPDF 才能生效。")
+            self.status_var.set(f"✓ 已保存到 {self.settings_file.path}")
+            messagebox.showinfo("保存成功", "设置已保存。\n部分更改可能需要重启 SumatraPDF 才能生效。")
         except Exception as e:
             messagebox.showerror("错误", f"保存失败:\n{e}")
 
-    def _save_as_file(self):
-        self._collect_values()
-        path = filedialog.asksaveasfilename(
-            title="另存为",
-            defaultextension=".txt",
-            filetypes=[("设置文件", "*.txt"), ("所有文件", "*.*")],
-            initialfile="SumatraPDF-settings.txt"
-        )
-        if path:
-            try:
-                self.settings_file.save(path)
-                self.settings_file.path = path
-                self.path_var.set(path)
-                self.status_var.set(f"已保存到 {path}")
-                messagebox.showinfo("保存成功", "设置已保存。")
-            except Exception as e:
-                messagebox.showerror("错误", f"保存失败:\n{e}")
-
-    def _reset_defaults(self):
-        if not messagebox.askyesno("恢复默认值",
-                                    "这将把当前分类的所有设置恢复为默认值。\n是否继续？"):
-            return
-
-        for meta in SETTINGS_META:
-            key, stype, default, desc, cat, options = meta
-            if cat == self.current_category:
-                self.settings_file.set_value(key, str(default) if default is not None else "")
-
-        # 刷新
-        self._show_category(self.current_category)
-        self.status_var.set(f"已将 {self.current_category} 恢复为默认值")
-
-    def _show_about(self):
-        messagebox.showinfo(
-            "关于",
-            "SumatraPDF 高级设置编辑器 v1.0\n\n"
-            "用于可视化编辑 SumatraPDF 高级设置的 GUI 工具。\n\n"
-            "基于官方设置文档:\n"
-            "https://www.sumatrapdfreader.org/settings/settings3-6\n\n"
-            "提示: 保存文件后更改生效。\n"
-            "部分设置需要重启 SumatraPDF。"
-        )
-
     def _ask_for_file(self):
-        """当自动检测失败时提示用户定位设置文件。"""
         result = messagebox.askyesnocancel(
             "未找到设置文件",
             "无法自动检测到 SumatraPDF-settings.txt。\n\n"
@@ -986,7 +961,6 @@ class SettingsEditor(tk.Tk):
         if result is True:
             self._open_file()
         elif result is False:
-            # 创建新的空设置文件
             path = filedialog.asksaveasfilename(
                 title="创建新设置文件",
                 defaultextension=".txt",
@@ -1001,10 +975,6 @@ class SettingsEditor(tk.Tk):
                 if self.current_category:
                     self._show_category(self.current_category)
 
-
-# ──────────────────────────────────────────────────────────────────────
-# 入口点
-# ──────────────────────────────────────────────────────────────────────
 
 def main():
     settings_path = sys.argv[1] if len(sys.argv) > 1 else None
