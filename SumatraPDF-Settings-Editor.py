@@ -642,9 +642,10 @@ class SettingsEditor(tk.Tk):
         self.configure(bg=Colors.BG)
 
         self.settings_file = SettingsFile()
-        self.widgets: dict[str, Any] = {}
         self.current_category = None
         self._sidebar_buttons: list[tk.Button] = []
+        # 预建页面: category_name -> (frame, widgets_dict)
+        self._pages: dict[str, tuple[tk.Frame, dict[str, Any]]] = {}
 
         if settings_path:
             self._load_file(settings_path)
@@ -771,6 +772,9 @@ class SettingsEditor(tk.Tk):
             self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
         self.canvas.bind_all("<MouseWheel>", _on_mousewheel)
 
+        # 预建所有分类页面
+        self._build_all_pages()
+
         # 底部状态栏
         status_bar = tk.Frame(self, bg=Colors.CARD_BG, height=32)
         status_bar.pack(fill="x", side="bottom")
@@ -800,6 +804,29 @@ class SettingsEditor(tk.Tk):
         btn.pack(side="left", padx=4)
         return btn
 
+    def _build_all_pages(self):
+        """预建所有分类页面，切换时只显示/隐藏，避免闪烁。"""
+        for cat in CATEGORIES:
+            page = tk.Frame(self.scrollable_frame, bg=Colors.BG)
+            widgets = {}
+
+            # 分类标题
+            header = tk.Frame(page, bg=Colors.BG)
+            header.pack(fill="x", padx=28, pady=(24, 16))
+            tk.Label(header, text=cat, font=Fonts.TITLE,
+                     bg=Colors.BG, fg=Colors.TEXT).pack(anchor="w")
+
+            cat_settings = [s for s in SETTINGS_META if s[4] == cat]
+            if not cat_settings:
+                tk.Label(page, text="此分类没有可编辑的设置项",
+                         font=Fonts.BODY, bg=Colors.BG, fg=Colors.TEXT_MUTED).pack(pady=40)
+            else:
+                for meta in cat_settings:
+                    key, stype, default, desc, _, options = meta
+                    self._add_setting_card(page, key, stype, default, desc, options, widgets)
+
+            self._pages[cat] = (page, widgets)
+
     def _select_category(self, category: str, idx: int):
         # 更新侧边栏选中状态
         for i, btn in enumerate(self._sidebar_buttons):
@@ -808,36 +835,23 @@ class SettingsEditor(tk.Tk):
             else:
                 btn.configure(bg=Colors.SIDEBAR_BG, fg=Colors.TEXT_SECONDARY)
 
+        # 隐藏当前页面
+        if self.current_category and self.current_category in self._pages:
+            self._pages[self.current_category][0].pack_forget()
+
+        # 显示新页面
         self.current_category = category
-        self._show_category(category)
+        page, _ = self._pages[category]
+        page.pack(fill="both", expand=True)
 
-    def _show_category(self, category: str):
-        for widget in self.scrollable_frame.winfo_children():
-            widget.destroy()
-        self.widgets.clear()
+        # 滚动到顶部
+        self.canvas.yview_moveto(0)
 
-        # 分类标题
-        header = tk.Frame(self.scrollable_frame, bg=Colors.BG)
-        header.pack(fill="x", padx=28, pady=(24, 16))
-        tk.Label(header, text=category, font=Fonts.TITLE,
-                 bg=Colors.BG, fg=Colors.TEXT).pack(anchor="w")
-
-        cat_settings = [s for s in SETTINGS_META if s[4] == category]
-        if not cat_settings:
-            tk.Label(self.scrollable_frame, text="此分类没有可编辑的设置项",
-                     font=Fonts.BODY, bg=Colors.BG, fg=Colors.TEXT_MUTED).pack(pady=40)
-            return
-
-        # 设置卡片容器
-        for meta in cat_settings:
-            key, stype, default, desc, cat, options = meta
-            self._add_setting_card(key, stype, default, desc, options)
-
-    def _add_setting_card(self, key: str, stype: str, default: Any, desc: str, options):
+    def _add_setting_card(self, parent, key, stype, default, desc, options, widgets):
         current = self.settings_file.get(key)
 
         # 卡片
-        card = tk.Frame(self.scrollable_frame, bg=Colors.CARD_BG,
+        card = tk.Frame(parent, bg=Colors.CARD_BG,
                         highlightbackground=Colors.BORDER, highlightthickness=1)
         card.pack(fill="x", padx=28, pady=(0, 8))
 
@@ -859,50 +873,47 @@ class SettingsEditor(tk.Tk):
 
         if stype == "bool":
             var = tk.BooleanVar(value=self.settings_file.get_bool(key))
-            # 自定义样式的复选框
-            cb_frame = tk.Frame(widget_frame, bg=Colors.CARD_BG)
-            cb_frame.pack(side="left")
-            cb = tk.Checkbutton(cb_frame, text="启用", variable=var, font=Fonts.BODY,
+            cb = tk.Checkbutton(widget_frame, text="启用", variable=var, font=Fonts.BODY,
                                 bg=Colors.CARD_BG, fg=Colors.TEXT, selectcolor=Colors.CARD_BG,
                                 activebackground=Colors.CARD_BG, activeforeground=Colors.TEXT,
                                 bd=0, highlightthickness=0, cursor="hand2")
             cb.pack(side="left")
-            self.widgets[key] = ("bool", var)
+            widgets[key] = ("bool", var)
 
         elif stype == "int":
             var = tk.StringVar(value=current if current else str(default))
-            entry = self._make_entry(widget_frame, var)
-            self.widgets[key] = ("str", var)
+            self._make_entry(widget_frame, var)
+            widgets[key] = ("str", var)
 
         elif stype == "float":
             var = tk.StringVar(value=current if current else str(default))
-            entry = self._make_entry(widget_frame, var)
-            self.widgets[key] = ("str", var)
+            self._make_entry(widget_frame, var)
+            widgets[key] = ("str", var)
 
         elif stype == "str":
             var = tk.StringVar(value=current)
             entry = self._make_entry(widget_frame, var, width=50)
             entry.pack(side="left", fill="x", expand=True)
-            self.widgets[key] = ("str", var)
+            widgets[key] = ("str", var)
 
         elif stype == "color":
             color_btn = ColorButton(widget_frame, color_str=current)
             color_btn.pack(side="left")
-            self.widgets[key] = ("color", color_btn)
+            widgets[key] = ("color", color_btn)
 
         elif stype == "choice":
             var = tk.StringVar(value=current if current else str(default))
             combo = ttk.Combobox(widget_frame, textvariable=var, values=options,
                                  state="readonly", width=28, font=Fonts.INPUT)
             combo.pack(side="left")
-            self.widgets[key] = ("str", var)
+            widgets[key] = ("str", var)
 
         elif stype == "compact":
             var = tk.StringVar(value=current if current else str(default))
-            entry = self._make_entry(widget_frame, var, width=30)
+            self._make_entry(widget_frame, var, width=30)
             tk.Label(widget_frame, text="空格分隔多个值", font=Fonts.SMALL_MUTED,
                      bg=Colors.CARD_BG, fg=Colors.TEXT_MUTED).pack(side="left", padx=12)
-            self.widgets[key] = ("str", var)
+            widgets[key] = ("str", var)
 
     def _make_entry(self, parent, var, width=20):
         entry_frame = tk.Frame(parent, bg=Colors.INPUT_BORDER, padx=1, pady=1)
@@ -916,16 +927,18 @@ class SettingsEditor(tk.Tk):
         return entry
 
     def _collect_values(self):
-        for key, (wtype, widget) in self.widgets.items():
-            if wtype == "bool":
-                val = "true" if widget.get() else "false"
-            elif wtype == "str":
-                val = widget.get()
-            elif wtype == "color":
-                val = widget.get_value()
-            else:
-                val = str(widget)
-            self.settings_file.set_value(key, val)
+        """从所有预建页面收集控件值。"""
+        for cat, (page, widgets) in self._pages.items():
+            for key, (wtype, widget) in widgets.items():
+                if wtype == "bool":
+                    val = "true" if widget.get() else "false"
+                elif wtype == "str":
+                    val = widget.get()
+                elif wtype == "color":
+                    val = widget.get_value()
+                else:
+                    val = str(widget)
+                self.settings_file.set_value(key, val)
 
     def _open_file(self):
         path = filedialog.askopenfilename(
@@ -936,9 +949,26 @@ class SettingsEditor(tk.Tk):
         if path:
             self._load_file(path)
             self.path_var.set(path)
-            if self.current_category:
-                idx = CATEGORIES.index(self.current_category) if self.current_category in CATEGORIES else 0
-                self._select_category(self.current_category, idx)
+            # 重建所有页面以加载新数据
+            self._rebuild_pages()
+
+    def _rebuild_pages(self):
+        """销毁并重建所有分类页面（用于加载新文件后）。"""
+        # 隐藏当前页面
+        if self.current_category and self.current_category in self._pages:
+            self._pages[self.current_category][0].pack_forget()
+        # 销毁旧页面
+        for cat, (page, widgets) in self._pages.items():
+            page.destroy()
+        self._pages.clear()
+        # 重建
+        self._build_all_pages()
+        # 恢复选中状态
+        if self.current_category and self.current_category in CATEGORIES:
+            idx = CATEGORIES.index(self.current_category)
+            self._select_category(self.current_category, idx)
+        else:
+            self._select_category(CATEGORIES[0], 0)
 
     def _save_file(self):
         self._collect_values()
@@ -972,8 +1002,7 @@ class SettingsEditor(tk.Tk):
                     f.write("; SumatraPDF 设置文件\n")
                 self._load_file(path)
                 self.path_var.set(path)
-                if self.current_category:
-                    self._show_category(self.current_category)
+                self._rebuild_pages()
 
 
 def main():
