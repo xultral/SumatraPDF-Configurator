@@ -1383,10 +1383,14 @@ class SettingsEditor(tk.Tk):
         tk.Label(row_c, text="着色控件", font=Fonts.SMALL, bg=Colors.CARD_BG,
                  fg=Colors.TEXT_SECONDARY, width=14, anchor="w").pack(side="left")
         var_colorize = tk.BooleanVar(value=colorize.lower() == "true")
-        tk.Checkbutton(row_c, text="ColorizeControls（让菜单、工具栏等也使用主题颜色）",
-                       variable=var_colorize, font=Fonts.SMALL,
+        cb_font = (Fonts.FAMILY, 13)
+        tk.Checkbutton(row_c, text="  ColorizeControls（让菜单、工具栏等也使用主题颜色）",
+                       variable=var_colorize, font=cb_font,
                        bg=Colors.CARD_BG, fg=Colors.TEXT,
-                       selectcolor=Colors.CARD_BG).pack(side="left")
+                       selectcolor=Colors.CARD_BG,
+                       activebackground=Colors.CARD_BG, activeforeground=Colors.TEXT,
+                       bd=0, highlightthickness=0, cursor="hand2",
+                       padx=8, pady=4).pack(side="left")
         fields["ColorizeControls"] = var_colorize
 
         # 预览色块
@@ -1611,10 +1615,13 @@ class SettingsEditor(tk.Tk):
 
         if stype == "bool":
             var = tk.BooleanVar(value=self.settings_file.get_bool(key))
-            cb = tk.Checkbutton(widget_frame, text="启用", variable=var, font=Fonts.BODY,
+            # 用较大的字体让复选框更清晰可见
+            cb_font = (Fonts.FAMILY, 13)
+            cb = tk.Checkbutton(widget_frame, text="  启用", variable=var, font=cb_font,
                                 bg=Colors.CARD_BG, fg=Colors.TEXT, selectcolor=Colors.CARD_BG,
                                 activebackground=Colors.CARD_BG, activeforeground=Colors.TEXT,
-                                bd=0, highlightthickness=0, cursor="hand2")
+                                bd=0, highlightthickness=0, cursor="hand2",
+                                padx=8, pady=4)
             cb.pack(side="left")
             widgets[key] = ("bool", var)
 
