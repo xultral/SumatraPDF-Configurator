@@ -70,305 +70,258 @@ class Fonts:
 # 设置元数据
 # ──────────────────────────────────────────────────────────────────────
 
+# 基于 SumatraPDF 3.6 官方设置文档
+# https://www.sumatrapdfreader.org/settings/settings3-6
+
 CATEGORIES = [
     "常规",
-    "显示与缩放",
-    "界面与交互",
-    "颜色与主题",
-    "固定页面 UI",
-    "电子书 UI",
-    "漫画书 UI",
-    "图片 UI",
-    "CHM UI",
-    "批注",
-    "正向搜索",
+    "页面显示",
+    "工具栏与侧边栏",
+    "主题与外观",
+    "PDF / XPS / DjVu 页面",
+    "电子书",
+    "漫画与图片",
+    "CHM 帮助文件",
+    "PDF 批注",
+    "LaTeX 正向搜索",
     "打印",
-    "全屏模式",
-    "AI 聊天 (Claude Code)",
-    "AI 聊天 (Grok Build)",
-    "AI 聊天 (Codex Build)",
-    "专家 / 内部",
+    "快捷键",
+    "外部查看器",
+    "选中文字处理",
+    "高级选项",
 ]
 
-SETTINGS_META = [
-    # ── 常规 ──
-    ("CheckForUpdates", "bool", True,
-     "每天检查一次更新", "常规", None),
-    ("NoHomeTab", "bool", False,
-     "不打开主页标签", "常规", None),
-    ("HomePageSortByFrequentlyRead", "bool", False,
-     "主页按使用频率排序（3.6 之前的行为）", "常规", None),
-    ("HomePageShowList", "bool", False,
-     "主页历史以列表而非缩略图显示", "常规", None),
-    ("UseTabs", "bool", True,
-     "在标签页中打开文档（而非新窗口）", "常规", None),
-    ("TabsMru", "bool", False,
-     "Ctrl+Tab 按最近使用顺序切换标签", "常规", None),
-    ("ReuseInstance", "bool", True,
-     "始终使用已有 SumatraPDF 进程打开文件", "常规", None),
-    ("RememberOpenedFiles", "bool", True,
-     "记住已打开的文件及其显示设置", "常规", None),
-    ("RememberStatePerDocument", "bool", True,
-     "为每个文档单独存储显示设置", "常规", None),
-    ("RestoreSession", "bool", True,
-     "启动时恢复上次会话", "常规", None),
-    ("LazyLoading", "bool", False,
-     "延迟加载文档，直到选中其标签页", "常规", None),
-    ("UiLanguage", "str", "",
-     "界面语言 ISO 代码（如 cn, de, fr, ja）", "常规", None),
+# 每条: (配置键, 类型, 默认值, 中文说明, 分类, 选项)
+# 类型: "bool", "int", "float", "str", "color", "choice", "compact"
 
-    # ── 显示与缩放 ──
+SETTINGS_META = [
+    # ══════════════════════════════════════════════
+    # 常规
+    # ══════════════════════════════════════════════
+    ("CheckForUpdates", "bool", True,
+     "每天自动检查更新", "常规", None),
+    ("UseTabs", "bool", True,
+     "用标签页打开文档，而不是每个文件开一个新窗口", "常规", None),
+    ("RememberOpenedFiles", "bool", True,
+     "记住打开过的文件和它们的显示状态", "常规", None),
+    ("RememberStatePerDocument", "bool", True,
+     "为每个文件单独记住缩放、页面布局等设置", "常规", None),
+    ("RestoreSession", "bool", True,
+     "下次启动时自动恢复上次打开的文件和标签页", "常规", None),
+    ("ReuseInstance", "bool", True,
+     "打开新文件时复用已有的 SumatraPDF 窗口", "常规", None),
+    ("NoHomeTab", "bool", False,
+     "不显示主页标签页", "常规", None),
+    ("HomePageSortByFrequentlyRead", "bool", False,
+     "主页按打开频率排序（3.6 之前的老方式），否则按最近打开排序", "常规", None),
+    ("LazyLoading", "bool", False,
+     "恢复会话时，延迟加载标签页直到用户切换过去", "常规", None),
+    ("UiLanguage", "str", "",
+     "界面语言代码，如 cn（简体中文）、en（英文）、de（德文）", "常规", None),
+
+    # ══════════════════════════════════════════════
+    # 页面显示
+    # ══════════════════════════════════════════════
     ("DefaultDisplayMode", "choice", "automatic",
-     "默认页面布局", "显示与缩放",
+     "默认页面布局方式", "页面显示",
      ["automatic", "single page", "facing", "book view",
       "continuous", "continuous facing", "continuous book view"]),
     ("DefaultZoom", "str", "fit page",
-     "默认缩放（fit page, fit width, fit content 或百分比如 100%）",
-     "显示与缩放", None),
+     "默认缩放比例，可用值：fit page、fit width、fit content 或百分比如 100%",
+     "页面显示", None),
     ("ZoomIncrement", "float", 0,
-     "缩放步长百分比（0 = 使用 ZoomLevels）", "显示与缩放", None),
+     "每次缩放的步长百分比，设为 0 则使用 ZoomLevels 中的值", "页面显示", None),
     ("ZoomLevels", "str", "",
-     "自定义缩放级别（空格分隔，范围 8.33-6400）", "显示与缩放", None),
+     "自定义缩放级别序列（空格分隔），每个值在 8.33 到 6400 之间", "页面显示", None),
     ("SmoothScroll", "bool", False,
-     "启用平滑滚动", "显示与缩放", None),
+     "平滑滚动", "页面显示", None),
     ("FastScrollOverScrollbar", "bool", False,
-     "鼠标在滚动条上时加速滚轮滚动", "显示与缩放", None),
-    ("Scrollbars", "choice", "windows",
-     "滚动条模式", "显示与缩放",
-     ["windows", "smart", "overlay", "hidden"]),
+     "鼠标悬停在滚动条上时，滚轮滚动更快", "页面显示", None),
     ("ScrollbarInSinglePage", "bool", False,
-     "在单页模式下显示滚动条", "显示与缩放", None),
+     "单页模式下也显示滚动条", "页面显示", None),
     ("DisableAntiAlias", "bool", False,
-     "禁用 PDF 渲染的抗锯齿", "显示与缩放", None),
-    ("PreventSleepInFullscreen", "bool", True,
-     "全屏/演示模式下防止屏幕关闭", "显示与缩放", None),
-    ("CitationHoverDelay", "int", -1,
-     "引用悬停弹出延迟（毫秒，-1 = 禁用）", "显示与缩放", None),
+     "关闭 PDF 渲染的抗锯齿（文字边缘会变锐利但可能有锯齿）", "页面显示", None),
 
-    # ── 界面与交互 ──
+    # ══════════════════════════════════════════════
+    # 工具栏与侧边栏
+    # ══════════════════════════════════════════════
     ("ShowToolbar", "bool", True,
-     "显示工具栏", "界面与交互", None),
-    ("Toolbar", "choice", "",
-     "工具栏模式（空 = 由 ShowToolbar 决定）", "界面与交互",
-     ["", "show", "hide", "overlay"]),
-    ("ToolbarPosition", "choice", "top",
-     "工具栏位置", "界面与交互", ["top", "bottom"]),
+     "显示顶部工具栏", "工具栏与侧边栏", None),
     ("ToolbarSize", "int", 18,
-     "工具栏高度", "界面与交互", None),
-    ("TabWidth", "int", 300,
-     "单个标签页最大宽度", "界面与交互", None),
+     "工具栏图标大小（像素）", "工具栏与侧边栏", None),
     ("ShowMenubar", "bool", True,
-     "显示菜单栏（F9 切换）", "界面与交互", None),
-    ("ShowMenubarWithTabs", "bool", False,
-     "使用标签页时显示菜单栏", "界面与交互", None),
+     "显示菜单栏（仅在 UseTabs=false 时生效，按 F9 临时显示）", "工具栏与侧边栏", None),
     ("ShowFavorites", "bool", False,
-     "显示收藏夹侧边栏", "界面与交互", None),
+     "显示收藏夹侧边栏", "工具栏与侧边栏", None),
     ("ShowToc", "bool", True,
-     "如果文档包含目录则显示目录侧边栏", "界面与交互", None),
+     "文档有目录时自动显示目录侧边栏", "工具栏与侧边栏", None),
     ("ShowStartPage", "bool", True,
-     "未打开文档时显示常用文档列表", "界面与交互", None),
+     "没有打开文件时显示常用文档列表", "工具栏与侧边栏", None),
     ("ShowLinks", "bool", False,
-     "在文档中的链接周围绘制蓝色边框", "界面与交互", None),
-    ("ShowTips", "bool", True,
-     "在主页显示提示", "界面与交互", None),
+     "在文档中的链接周围画蓝色边框", "工具栏与侧边栏", None),
     ("SidebarDx", "int", 0,
-     "收藏夹/书签侧边栏宽度", "界面与交互", None),
+     "收藏夹/目录侧边栏的宽度（像素），0 表示默认", "工具栏与侧边栏", None),
     ("TocDy", "int", 0,
-     "当侧边栏两部分都可见时，目录部分的高度", "界面与交互", None),
-    ("SearchUIFloating", "bool", False,
-     "使用带结果列表的浮动查找窗口", "界面与交互", None),
-    ("FullPathInTitle", "bool", False,
-     "在标题栏显示文件完整路径", "界面与交互", None),
-    ("EscToExit", "bool", False,
-     "按 Esc 键关闭 SumatraPDF", "界面与交互", None),
+     "当收藏夹和目录同时显示时，目录部分的高度", "工具栏与侧边栏", None),
+    ("TabWidth", "int", 300,
+     "单个标签页的最大宽度（像素）", "工具栏与侧边栏", None),
     ("TreeFontName", "str", "automatic",
-     "书签/收藏夹树形视图字体（automatic = Windows 默认）",
-     "界面与交互", None),
+     "目录树和收藏夹树的字体，automatic 表示用系统默认", "工具栏与侧边栏", None),
     ("TreeFontSize", "int", 0,
-     "树形视图字体大小（0 = Windows 默认）", "界面与交互", None),
+     "目录树和收藏夹树的字体大小，0 表示用系统默认", "工具栏与侧边栏", None),
     ("UIFontSize", "int", 0,
-     "覆盖应用程序字体大小（0 = Windows 默认）", "界面与交互", None),
-    ("ReadAloudVoiceId", "str", "",
-     "朗读功能的语音 ID（空 = 系统默认）", "界面与交互", None),
-    ("ReadAloudSpeed", "float", 1,
-     "朗读速度倍率（0.5-3.0）", "界面与交互", None),
+     "覆盖整个程序的字体大小，0 表示用系统默认", "工具栏与侧边栏", None),
 
-    # ── 颜色与主题 ──
+    # ══════════════════════════════════════════════
+    # 主题与外观
+    # ══════════════════════════════════════════════
     ("Theme", "choice", "",
-     "颜色主题", "颜色与主题", ["", "light", "dark", "darker"]),
+     "颜色主题", "主题与外观", ["", "light", "dark", "darker"]),
     ("MainWindowBackground", "color", "#80fff200",
-     "非文档窗口的背景色", "颜色与主题", None),
-    ("CustomColors", "str", "",
-     "背景色选择器的自定义颜色（空格分隔，最多 13 个）",
-     "颜色与主题", None),
+     "非文档区域的背景色（默认是半透明黄色）", "主题与外观", None),
     ("UseSysColors", "bool", False,
-     "使用 Windows 系统颜色（覆盖其他颜色设置）", "颜色与主题", None),
+     "使用 Windows 系统配色，会覆盖上面的颜色设置", "主题与外观", None),
 
-    # ── 固定页面 UI ──
+    # ══════════════════════════════════════════════
+    # PDF / XPS / DjVu 页面
+    # ══════════════════════════════════════════════
     ("FixedPageUI.TextColor", "color", "#000000",
-     "文字颜色（替换黑色）", "固定页面 UI", None),
+     "文字颜色（替换文档中的黑色）", "PDF / XPS / DjVu 页面", None),
     ("FixedPageUI.BackgroundColor", "color", "#ffffff",
-     "背景色（替换白色）", "固定页面 UI", None),
-    ("FixedPageUI.SelectionColor", "color", "#ffff00",
-     "文字选择/查找高亮颜色（#aarrggbb 控制透明度）", "固定页面 UI", None),
+     "背景颜色（替换文档中的白色）", "PDF / XPS / DjVu 页面", None),
+    ("FixedPageUI.SelectionColor", "color", "#f5fc0c",
+     "选中文字和搜索高亮的颜色，用 #aarrggbb 格式可控制透明度", "PDF / XPS / DjVu 页面", None),
     ("FixedPageUI.WindowMargin", "compact", "2 4 2 4",
-     "窗口边距：上 右 下 左", "固定页面 UI", None),
+     "文档与窗口之间的边距（上 右 下 左）", "PDF / XPS / DjVu 页面", None),
     ("FixedPageUI.PageSpacing", "compact", "4 4",
-     "页面间距：水平 垂直", "固定页面 UI", None),
+     "双页模式下两页之间的间距（水平 垂直）", "PDF / XPS / DjVu 页面", None),
     ("FixedPageUI.GradientColors", "str", "",
-     "渐变背景色（最多 3 个，空格分隔）", "固定页面 UI", None),
+     "从上到下的渐变背景色（最多 3 个颜色，空格分隔），用于感知阅读进度",
+     "PDF / XPS / DjVu 页面", None),
     ("FixedPageUI.InvertColors", "bool", False,
-     "交换文字和背景颜色", "固定页面 UI", None),
-    ("FixedPageUI.WindowBgCol", "color", "",
-     "PDF 文件的画布背景色", "固定页面 UI", None),
+     "反转文字和背景颜色", "PDF / XPS / DjVu 页面", None),
+    ("FixedPageUI.HideScrollbars", "bool", False,
+     "隐藏滚动条（仍可用鼠标滚轮或键盘滚动）", "PDF / XPS / DjVu 页面", None),
 
-    # ── 电子书 UI ──
+    # ══════════════════════════════════════════════
+    # 电子书
+    # ══════════════════════════════════════════════
     ("EBookUI.FontSize", "float", 0,
-     "字体大小（0 = 默认 8.0）", "电子书 UI", None),
+     "电子书字体大小，0 表示默认值 8.0", "电子书", None),
     ("EBookUI.LayoutDx", "float", 0,
-     "布局宽度（0 = 默认 420）", "电子书 UI", None),
+     "电子书页面宽度，0 表示默认值 420", "电子书", None),
     ("EBookUI.LayoutDy", "float", 0,
-     "布局高度（0 = 默认 595）", "电子书 UI", None),
+     "电子书页面高度，0 表示默认值 595", "电子书", None),
     ("EBookUI.IgnoreDocumentCSS", "bool", False,
-     "忽略电子书的 CSS", "电子书 UI", None),
+     "忽略电子书自带的 CSS 样式", "电子书", None),
     ("EBookUI.CustomCSS", "str", "",
-     "自定义 CSS（可能需要设置 IgnoreDocumentCSS = true）", "电子书 UI", None),
-    ("EBookUI.WindowBgCol", "color", "",
-     "电子书的画布背景色", "电子书 UI", None),
+     "自定义 CSS（可能需要同时开启 IgnoreDocumentCSS）", "电子书", None),
 
-    # ── 漫画书 UI ──
+    # ══════════════════════════════════════════════
+    # 漫画与图片
+    # ══════════════════════════════════════════════
     ("ComicBookUI.WindowMargin", "compact", "0 0 0 0",
-     "窗口边距：上 右 下 左", "漫画书 UI", None),
+     "文档与窗口之间的边距（上 右 下 左）", "漫画与图片", None),
     ("ComicBookUI.PageSpacing", "compact", "4 4",
-     "页面间距：水平 垂直", "漫画书 UI", None),
+     "双页模式下两页之间的间距（水平 垂直）", "漫画与图片", None),
     ("ComicBookUI.CbxMangaMode", "bool", False,
-     "默认使用漫画模式（从右到左阅读）", "漫画书 UI", None),
-    ("ComicBookUI.WindowBgCol", "color", "",
-     "漫画书的画布背景色", "漫画书 UI", None),
+     "默认从右到左翻页（漫画模式）", "漫画与图片", None),
 
-    # ── 图片 UI ──
-    ("ImageUI.WindowBgCol", "color", "",
-     "图片文件的画布背景色", "图片 UI", None),
-    ("ImageUI.DefaultZoom", "choice", "shrink to fit",
-     "图片文件的默认缩放", "图片 UI",
-     ["fit page", "fit width", "fit content", "shrink to fit"]),
-
-    # ── CHM UI ──
+    # ══════════════════════════════════════════════
+    # CHM 帮助文件
+    # ══════════════════════════════════════════════
     ("ChmUI.UseFixedPageUI", "bool", False,
-     "对 CHM 文档使用 PDF 的 UI", "CHM UI", None),
+     "对 CHM 文件使用 PDF 的渲染方式", "CHM 帮助文件", None),
 
-    # ── 批注 ──
+    # ══════════════════════════════════════════════
+    # PDF 批注
+    # ══════════════════════════════════════════════
     ("Annotations.HighlightColor", "color", "#ffff00",
-     "高亮批注颜色", "批注", None),
+     "高亮批注的颜色", "PDF 批注", None),
     ("Annotations.UnderlineColor", "color", "#00ff00",
-     "下划线批注颜色", "批注", None),
+     "下划线批注的颜色", "PDF 批注", None),
     ("Annotations.SquigglyColor", "color", "#ff00ff",
-     "波浪线批注颜色", "批注", None),
+     "波浪线批注的颜色", "PDF 批注", None),
     ("Annotations.StrikeOutColor", "color", "#ff0000",
-     "删除线批注颜色", "批注", None),
+     "删除线批注的颜色", "PDF 批注", None),
     ("Annotations.FreeTextColor", "color", "",
-     "自由文本批注的文字颜色", "批注", None),
+     "文本批注的文字颜色", "PDF 批注", None),
     ("Annotations.FreeTextBackgroundColor", "color", "",
-     "自由文本批注的背景色", "批注", None),
+     "文本批注的背景颜色", "PDF 批注", None),
     ("Annotations.FreeTextOpacity", "int", 100,
-     "自由文本不透明度（0-100）", "批注", None),
+     "文本批注的不透明度（0 = 完全透明，100 = 完全不透明）", "PDF 批注", None),
     ("Annotations.FreeTextSize", "int", 12,
-     "自由文本批注字体大小", "批注", None),
+     "文本批注的字号", "PDF 批注", None),
     ("Annotations.FreeTextBorderWidth", "int", 1,
-     "自由文本批注边框宽度", "批注", None),
+     "文本批注的边框宽度", "PDF 批注", None),
     ("Annotations.TextIconColor", "color", "",
-     "文字图标批注颜色", "批注", None),
+     "便签图标的颜色", "PDF 批注", None),
     ("Annotations.TextIconType", "choice", "",
-     "文字批注图标类型", "批注",
+     "便签图标样式", "PDF 批注",
      ["", "comment", "help", "insert", "key", "new paragraph", "note", "paragraph"]),
     ("Annotations.DefaultAuthor", "str", "",
-     "默认批注作者（空 = Windows 用户名，(none) = 不添加）",
-     "批注", None),
+     "批注的默认作者名，留空用 Windows 用户名，填 (none) 则不添加作者",
+     "PDF 批注", None),
 
-    # ── 正向搜索 ──
+    # ══════════════════════════════════════════════
+    # LaTeX 正向搜索
+    # ══════════════════════════════════════════════
     ("ForwardSearch.HighlightOffset", "int", 0,
-     "高亮偏移（>0 = 左边距矩形样式）", "正向搜索", None),
+     "设为正数时，高亮样式变为页面左侧的矩形条（值为距页边的偏移）",
+     "LaTeX 正向搜索", None),
     ("ForwardSearch.HighlightWidth", "int", 15,
-     "高亮矩形宽度", "正向搜索", None),
+     "左侧矩形高亮条的宽度（需 HighlightOffset > 0）", "LaTeX 正向搜索", None),
     ("ForwardSearch.HighlightColor", "color", "#6581ff",
-     "正向搜索高亮颜色", "正向搜索", None),
+     "正向搜索高亮的颜色", "LaTeX 正向搜索", None),
     ("ForwardSearch.HighlightPermanent", "bool", False,
-     "高亮保持到下次点击（而非自动消失）", "正向搜索", None),
+     "高亮一直显示直到点击鼠标（否则会自动消失）", "LaTeX 正向搜索", None),
 
-    # ── 打印 ──
+    # ══════════════════════════════════════════════
+    # 打印
+    # ══════════════════════════════════════════════
     ("PrinterDefaults.PrintScale", "choice", "shrink",
-     "默认打印缩放", "打印", ["shrink", "fit", "none"]),
-    ("PrinterDefaults.Collate", "choice", "default",
-     "默认逐份打印设置", "打印", ["default", "collate", "nocollate"]),
+     "打印时的默认缩放方式", "打印", ["shrink", "fit", "none"]),
 
-    # ── 全屏模式 ──
-    ("Fullscreen.ShowToolbar", "bool", False,
-     "全屏模式下显示工具栏", "全屏模式", None),
-    ("Fullscreen.ShowMenubar", "bool", False,
-     "全屏模式下显示菜单栏", "全屏模式", None),
+    # ══════════════════════════════════════════════
+    # 快捷键
+    # ══════════════════════════════════════════════
+    # Shortcuts 是数组类型，这里只展示结构说明
+    # 格式: Shortcuts [ [ Cmd = CmdXxx  Key = Ctrl-X  Name = 显示名  ToolbarText = 工具栏文字 ] ]
 
-    # ── AI 聊天 (Claude Code) ──
-    ("ClaudeCode.Model", "str", "sonnet",
-     "Claude 模型别名（sonnet, opus, haiku）", "AI 聊天 (Claude Code)", None),
-    ("ClaudeCode.Models", "str", "",
-     "下拉菜单中的额外模型别名（逗号分隔）", "AI 聊天 (Claude Code)", None),
-    ("ClaudeCode.Effort", "choice", "1",
-     "推理努力级别", "AI 聊天 (Claude Code)", ["0", "1", "2", "3"]),
-    ("ClaudeCode.SkipPermissions", "bool", False,
-     "传递 --dangerously-skip-permissions 参数", "AI 聊天 (Claude Code)", None),
-    ("ClaudeCode.BgColor", "color", "#ffffff",
-     "聊天面板背景色", "AI 聊天 (Claude Code)", None),
+    # ══════════════════════════════════════════════
+    # 外部查看器
+    # ══════════════════════════════════════════════
+    # ExternalViewers 是数组类型
+    # 格式: ExternalViewers [ [ CommandLine = ...  Name = ...  Filter = ...  Key = ... ] ]
 
-    # ── AI 聊天 (Grok Build) ──
-    ("GrokBuild.Model", "str", "grok-composer-2.5-fast",
-     "Grok 模型 ID", "AI 聊天 (Grok Build)", None),
-    ("GrokBuild.Models", "str", "",
-     "下拉菜单中的额外模型 ID（逗号分隔）", "AI 聊天 (Grok Build)", None),
-    ("GrokBuild.Effort", "choice", "1",
-     "推理努力级别", "AI 聊天 (Grok Build)", ["0", "1", "2", "3", "4"]),
-    ("GrokBuild.AlwaysApprove", "bool", False,
-     "传递 --always-approve（自动批准工具执行）", "AI 聊天 (Grok Build)", None),
-    ("GrokBuild.BgColor", "color", "#ffffff",
-     "聊天面板背景色", "AI 聊天 (Grok Build)", None),
+    # ══════════════════════════════════════════════
+    # 选中文字处理
+    # ══════════════════════════════════════════════
+    # SelectionHandlers 是数组类型
+    # 格式: SelectionHandlers [ [ URL = ...  Name = ...  Key = ... ] ]
 
-    # ── AI 聊天 (Codex Build) ──
-    ("CodexBuild.Model", "str", "gpt-5.5",
-     "Codex 模型 ID", "AI 聊天 (Codex Build)", None),
-    ("CodexBuild.Models", "str", "",
-     "下拉菜单中的额外模型 ID（逗号分隔）", "AI 聊天 (Codex Build)", None),
-    ("CodexBuild.Sandbox", "choice", "1",
-     "沙箱模式", "AI 聊天 (Codex Build)", ["0", "1", "2"]),
-    ("CodexBuild.SkipSandbox", "bool", False,
-     "传递 --dangerously-bypass-approvals-and-sandbox", "AI 聊天 (Codex Build)", None),
-    ("CodexBuild.BgColor", "color", "#ffffff",
-     "聊天面板背景色", "AI 聊天 (Codex Build)", None),
-
-    # ── 专家 / 内部 ──
+    # ══════════════════════════════════════════════
+    # 高级选项
+    # ══════════════════════════════════════════════
     ("CustomScreenDPI", "int", 0,
-     "屏幕 DPI 覆盖（0 = 使用系统值）", "专家 / 内部", None),
-    ("DisableJavaScript", "bool", False,
-     "禁用 PDF 文档中的 JavaScript", "专家 / 内部", None),
-    ("AllowExternalImages", "bool", False,
-     "允许 PDF 加载外部图片", "专家 / 内部", None),
+     "手动指定屏幕 DPI，0 表示自动检测", "高级选项", None),
     ("EnableTeXEnhancements", "bool", False,
-     "在设置 -> 选项中显示 SyncTeX 反向搜索命令", "专家 / 内部", None),
+     "在设置菜单中显示 LaTeX 反向搜索的配置选项", "高级选项", None),
     ("InverseSearchCmdLine", "str", "",
-     "LaTeX 编辑器反向搜索命令", "专家 / 内部", None),
+     "LaTeX 反向搜索的命令行（点击 PDF 跳转到编辑器）", "高级选项", None),
     ("ReloadModifiedDocuments", "bool", True,
-     "自动重新加载已更改的文档", "专家 / 内部", None),
-    ("DisableAutoLinks", "bool", False,
-     "禁用 PDF 文本中 URL 的自动链接", "专家 / 内部", None),
-    ("AIChatSidebarDx", "int", 0,
-     "AI 聊天侧边栏宽度（0 = 默认）", "专家 / 内部", None),
-    ("TranslateToLang", "str", "",
-     "选中文字翻译的目标语言", "专家 / 内部", None),
+     "文件被修改后自动重新加载（电子书格式暂不支持）", "高级选项", None),
+    ("EscToExit", "bool", False,
+     "按 Esc 键关闭程序", "高级选项", None),
+    ("FullPathInTitle", "bool", False,
+     "标题栏显示文件的完整路径", "高级选项", None),
     ("DefaultPasswords", "str", "",
-     "受保护文档的密码（空格分隔）", "专家 / 内部", None),
+     "打开加密文档时自动尝试的密码（空格分隔，含空格的密码用引号括起）",
+     "高级选项", None),
     ("VersionToSkip", "str", "",
-     "跳过更新通知的版本号", "专家 / 内部", None),
+     "跳过该版本的更新提示", "高级选项", None),
     ("WindowState", "int", 1,
-     "默认窗口状态（1=正常, 2=最大化, 3=全屏, 4=最小化）",
-     "专家 / 内部", None),
+     "窗口默认状态：1=普通，2=最大化，3=全屏，4=最小化", "高级选项", None),
 ]
 
 SETTINGS_LOOKUP = {s[0]: s for s in SETTINGS_META}
@@ -817,9 +770,20 @@ class SettingsEditor(tk.Tk):
                      bg=Colors.BG, fg=Colors.TEXT).pack(anchor="w")
 
             cat_settings = [s for s in SETTINGS_META if s[4] == cat]
+            # 对于数组类型的分类，显示提示
+            array_categories = {
+                "快捷键": "快捷键是数组格式，需要手动编辑设置文件。\n\n格式示例：\nShortcuts [\n  [\n    Cmd = CmdFindNext\n    Key = F3\n  ]\n]",
+                "外部查看器": "外部查看器是数组格式，需要手动编辑设置文件。\n\n格式示例：\nExternalViewers [\n  [\n    CommandLine = \"C:\\Path\\to\\viewer.exe\" \"%1\"\n    Name = 我的查看器\n    Filter = *.pdf\n    Key = Alt + 1\n  ]\n]",
+                "选中文字处理": "选中文字处理是数组格式，需要手动编辑设置文件。\n\n格式示例：\nSelectionHandlers [\n  [\n    URL = https://translate.google.com/?sl=auto&tl=zh-CN&text=${selection}\n    Name = Google 翻译\n  ]\n]",
+            }
             if not cat_settings:
-                tk.Label(page, text="此分类没有可编辑的设置项",
-                         font=Fonts.BODY, bg=Colors.BG, fg=Colors.TEXT_MUTED).pack(pady=40)
+                if cat in array_categories:
+                    tk.Label(page, text=array_categories[cat],
+                             font=Fonts.BODY, bg=Colors.BG, fg=Colors.TEXT_SECONDARY,
+                             justify="left", wraplength=650).pack(pady=40, padx=28, anchor="w")
+                else:
+                    tk.Label(page, text="此分类没有可编辑的设置项",
+                             font=Fonts.BODY, bg=Colors.BG, fg=Colors.TEXT_MUTED).pack(pady=40)
             else:
                 for meta in cat_settings:
                     key, stype, default, desc, _, options = meta
