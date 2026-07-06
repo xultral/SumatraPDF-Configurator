@@ -99,6 +99,10 @@ SelectionHandlers [
 ]
 
 Shortcuts [
+  [
+    Cmd = CmdCreateAnnotHighlight
+    Key = B
+  ]
 ]
 
 Themes [

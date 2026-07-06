@@ -88,6 +88,7 @@ CATEGORIES = [
     "快捷键",
     "外部查看器",
     "选中文字处理",
+    "自定义主题",
     "高级选项",
 ]
 
@@ -693,8 +694,9 @@ class SettingsFile:
                 lines.append(f"{key} = {val}\n")
             elif entry[0] == "struct":
                 _, name, items = entry
-                # Shortcuts 数组特殊处理：直接从 parse tree 写出值
-                if name == "Shortcuts":
+                # 数组类型特殊处理：直接从 parse tree 写出值
+                if name in ("Shortcuts", "ExternalViewers", "SelectionHandlers",
+                            "Themes", "TabGroups"):
                     lines.append(f"{name} [\n")
                     for item in items:
                         if item[0] == "struct" and item[1] == "":
@@ -1005,6 +1007,7 @@ class SettingsEditor(tk.Tk):
                 "快捷键": "shortcuts",
                 "外部查看器": "external",
                 "选中文字处理": "selection",
+                "自定义主题": "themes",
             }
             if not cat_settings:
                 if cat in array_categories:
@@ -1020,24 +1023,16 @@ class SettingsEditor(tk.Tk):
             self._pages[cat] = (page, widgets)
 
     def _build_array_category_page(self, page, page_type):
-        """为数组类型的分类（快捷键、外部查看器等）构建可视化编辑页面。"""
+        """为数组类型的分类构建可视化编辑页面。"""
 
         if page_type == "shortcuts":
             self._build_shortcuts_editor(page)
         elif page_type == "external":
-            tk.Label(page, text=(
-                "外部查看器是数组格式，需要手动编辑设置文件。\n\n"
-                "格式示例：\n\n"
-                "ExternalViewers [\n"
-                "  [\n"
-                '    CommandLine = "C:\\Path\\to\\viewer.exe" "%1"\n'
-                "    Name = 我的查看器\n"
-                "    Filter = *.pdf\n"
-                "    Key = Alt + 1\n"
-                "  ]\n"
-                "]"
-            ), font=("Consolas", 10), bg=Colors.BG, fg=Colors.TEXT_SECONDARY,
-                justify="left", wraplength=650).pack(pady=40, padx=28, anchor="w")
+            self._build_external_viewers_editor(page)
+        elif page_type == "selection":
+            self._build_selection_handlers_editor(page)
+        elif page_type == "themes":
+            self._build_themes_editor(page)
 
         elif page_type == "selection":
             tk.Label(page, text=(
@@ -1052,6 +1047,365 @@ class SettingsEditor(tk.Tk):
                 "]"
             ), font=("Consolas", 10), bg=Colors.BG, fg=Colors.TEXT_SECONDARY,
                 justify="left", wraplength=650).pack(pady=40, padx=28, anchor="w")
+
+    def _build_external_viewers_editor(self, page):
+        """构建外部查看器可视化编辑器。"""
+        # 提示
+        hint_frame = tk.Frame(page, bg=Colors.ACCENT_LIGHT)
+        hint_frame.pack(fill="x", padx=28, pady=(0, 12))
+        tk.Label(hint_frame, text=(
+            "💡 配置外部查看器后，可以在文件菜单中直接用其他程序打开当前文档。\n"
+            "CommandLine 中 %1 代表文件路径，%p 代表页码，%d 代表文件所在目录。"
+        ), font=Fonts.SMALL, bg=Colors.ACCENT_LIGHT, fg=Colors.ACCENT,
+            justify="left", padx=16, pady=10).pack(anchor="w")
+
+        # 读取现有的
+        existing_viewers = self._get_array_entries("ExternalViewers",
+                                                    ["CommandLine", "Name", "Filter", "Key"])
+
+        self._viewer_widgets = []
+
+        # 预设模板
+        presets = [
+            ("Adobe Acrobat", '"C:\\Program Files\\Adobe\\Acrobat DC\\Acrobat\\Acrobat.exe" "%1"', "*.pdf"),
+            ("Foxit Reader", '"C:\\Program Files\\Foxit Software\\Foxit Reader\\FoxitReader.exe" "%1"', "*.pdf"),
+            ("PDF-XChange", '"C:\\Program Files\\Tracker Software\\PDF Editor\\PDFXEdit.exe" "%1"', "*.pdf"),
+        ]
+
+        # 预设按钮
+        preset_frame = tk.Frame(page, bg=Colors.BG)
+        preset_frame.pack(fill="x", padx=28, pady=(0, 8))
+        tk.Label(preset_frame, text="快速添加：", font=Fonts.SMALL,
+                 bg=Colors.BG, fg=Colors.TEXT_SECONDARY).pack(side="left")
+        for name, cmd, filt in presets:
+            btn = tk.Button(preset_frame, text=name, font=Fonts.SMALL,
+                            bg=Colors.HOVER, fg=Colors.TEXT, bd=0, padx=8, pady=2,
+                            cursor="hand2",
+                            command=lambda n=name, c=cmd, f=filt: self._add_viewer(n, c, f))
+            btn.pack(side="left", padx=4)
+
+        # 添加自定义按钮
+        add_btn = tk.Button(preset_frame, text="+ 自定义", font=Fonts.SMALL,
+                            bg=Colors.ACCENT, fg="white", bd=0, padx=8, pady=2,
+                            cursor="hand2",
+                            command=lambda: self._add_viewer("", "", "*.pdf"))
+        add_btn.pack(side="left", padx=4)
+
+        # 列表容器
+        self._viewer_list_frame = tk.Frame(page, bg=Colors.BG)
+        self._viewer_list_frame.pack(fill="x", padx=28)
+
+        # 显示已有的
+        for viewer in existing_viewers:
+            self._add_viewer_card(viewer.get("CommandLine", ""),
+                                  viewer.get("Name", ""),
+                                  viewer.get("Filter", ""),
+                                  viewer.get("Key", ""))
+
+        # 如果没有，显示一个空的
+        if not existing_viewers:
+            self._add_viewer_card("", "", "*.pdf", "")
+
+    def _add_viewer(self, name, cmd, filt):
+        self._add_viewer_card(cmd, name, filt, "")
+
+    def _add_viewer_card(self, cmd, name, filt, key):
+        """添加一个外部查看器卡片。"""
+        card = tk.Frame(self._viewer_list_frame, bg=Colors.CARD_BG,
+                        highlightbackground=Colors.BORDER, highlightthickness=1)
+        card.pack(fill="x", pady=(0, 8))
+        inner = tk.Frame(card, bg=Colors.CARD_BG)
+        inner.pack(fill="x", padx=16, pady=12)
+
+        # 删除按钮
+        del_btn = tk.Button(inner, text="✕", font=Fonts.SMALL, bg=Colors.CARD_BG,
+                            fg=Colors.TEXT_MUTED, bd=0, cursor="hand2",
+                            command=lambda: card.destroy())
+        del_btn.pack(anchor="e")
+
+        fields = {}
+
+        row1 = tk.Frame(inner, bg=Colors.CARD_BG)
+        row1.pack(fill="x", pady=2)
+        tk.Label(row1, text="命令行", font=Fonts.SMALL, bg=Colors.CARD_BG,
+                 fg=Colors.TEXT_SECONDARY, width=10, anchor="w").pack(side="left")
+        var_cmd = tk.StringVar(value=cmd)
+        e_cmd = self._make_entry(row1, var_cmd, width=60)
+        e_cmd.pack(side="left", fill="x", expand=True)
+        fields["CommandLine"] = var_cmd
+
+        row2 = tk.Frame(inner, bg=Colors.CARD_BG)
+        row2.pack(fill="x", pady=2)
+        tk.Label(row2, text="显示名称", font=Fonts.SMALL, bg=Colors.CARD_BG,
+                 fg=Colors.TEXT_SECONDARY, width=10, anchor="w").pack(side="left")
+        var_name = tk.StringVar(value=name)
+        self._make_entry(row2, var_name, width=30)
+        fields["Name"] = var_name
+
+        row3 = tk.Frame(inner, bg=Colors.CARD_BG)
+        row3.pack(fill="x", pady=2)
+        tk.Label(row3, text="文件过滤", font=Fonts.SMALL, bg=Colors.CARD_BG,
+                 fg=Colors.TEXT_SECONDARY, width=10, anchor="w").pack(side="left")
+        var_filter = tk.StringVar(value=filt)
+        self._make_entry(row3, var_filter, width=30)
+        fields["Filter"] = var_filter
+        tk.Label(row3, text="如 *.pdf 或 *.pdf;*.xps", font=Fonts.SMALL_MUTED,
+                 bg=Colors.CARD_BG, fg=Colors.TEXT_MUTED).pack(side="left", padx=8)
+
+        row4 = tk.Frame(inner, bg=Colors.CARD_BG)
+        row4.pack(fill="x", pady=2)
+        tk.Label(row4, text="快捷键", font=Fonts.SMALL, bg=Colors.CARD_BG,
+                 fg=Colors.TEXT_SECONDARY, width=10, anchor="w").pack(side="left")
+        var_key = tk.StringVar(value=key)
+        self._make_entry(row4, var_key, width=20)
+        fields["Key"] = var_key
+        tk.Label(row4, text="如 Alt+7", font=Fonts.SMALL_MUTED,
+                 bg=Colors.CARD_BG, fg=Colors.TEXT_MUTED).pack(side="left", padx=8)
+
+        self._viewer_widgets.append((card, fields))
+
+    def _build_selection_handlers_editor(self, page):
+        """构建选中文字处理可视化编辑器。"""
+        hint_frame = tk.Frame(page, bg=Colors.ACCENT_LIGHT)
+        hint_frame.pack(fill="x", padx=28, pady=(0, 12))
+        tk.Label(hint_frame, text=(
+            "💡 配置后，选中文字右键即可看到菜单项。URL 中 ${selection} 会被替换为选中的文字。"
+        ), font=Fonts.SMALL, bg=Colors.ACCENT_LIGHT, fg=Colors.ACCENT,
+            justify="left", padx=16, pady=10).pack(anchor="w")
+
+        existing = self._get_array_entries("SelectionHandlers", ["URL", "Name", "Key"])
+
+        self._selection_widgets = []
+
+        # 预设
+        presets = [
+            ("Google 翻译", "https://translate.google.com/?sl=auto&tl=zh-CN&text=${selection}"),
+            ("DeepL 翻译", "https://www.deepl.com/translator#auto/zh/${selection}"),
+            ("Google 搜索", "https://www.google.com/search?q=${selection}"),
+            ("百度搜索", "https://www.baidu.com/s?wd=${selection}"),
+            ("Wikipedia", "https://en.wikipedia.org/wiki/Special:Search?search=${selection}"),
+        ]
+
+        preset_frame = tk.Frame(page, bg=Colors.BG)
+        preset_frame.pack(fill="x", padx=28, pady=(0, 8))
+        tk.Label(preset_frame, text="快速添加：", font=Fonts.SMALL,
+                 bg=Colors.BG, fg=Colors.TEXT_SECONDARY).pack(side="left")
+        for name, url in presets:
+            btn = tk.Button(preset_frame, text=name, font=Fonts.SMALL,
+                            bg=Colors.HOVER, fg=Colors.TEXT, bd=0, padx=8, pady=2,
+                            cursor="hand2",
+                            command=lambda n=name, u=url: self._add_selection_handler(n, u))
+            btn.pack(side="left", padx=4)
+
+        add_btn = tk.Button(preset_frame, text="+ 自定义", font=Fonts.SMALL,
+                            bg=Colors.ACCENT, fg="white", bd=0, padx=8, pady=2,
+                            cursor="hand2",
+                            command=lambda: self._add_selection_handler("", ""))
+        add_btn.pack(side="left", padx=4)
+
+        self._selection_list_frame = tk.Frame(page, bg=Colors.BG)
+        self._selection_list_frame.pack(fill="x", padx=28)
+
+        for handler in existing:
+            self._add_selection_card(handler.get("URL", ""),
+                                     handler.get("Name", ""),
+                                     handler.get("Key", ""))
+
+        if not existing:
+            self._add_selection_card("", "", "")
+
+    def _add_selection_handler(self, name, url):
+        self._add_selection_card(url, name, "")
+
+    def _add_selection_card(self, url, name, key):
+        """添加一个选中文字处理卡片。"""
+        card = tk.Frame(self._selection_list_frame, bg=Colors.CARD_BG,
+                        highlightbackground=Colors.BORDER, highlightthickness=1)
+        card.pack(fill="x", pady=(0, 8))
+        inner = tk.Frame(card, bg=Colors.CARD_BG)
+        inner.pack(fill="x", padx=16, pady=12)
+
+        del_btn = tk.Button(inner, text="✕", font=Fonts.SMALL, bg=Colors.CARD_BG,
+                            fg=Colors.TEXT_MUTED, bd=0, cursor="hand2",
+                            command=lambda: card.destroy())
+        del_btn.pack(anchor="e")
+
+        fields = {}
+
+        row1 = tk.Frame(inner, bg=Colors.CARD_BG)
+        row1.pack(fill="x", pady=2)
+        tk.Label(row1, text="显示名称", font=Fonts.SMALL, bg=Colors.CARD_BG,
+                 fg=Colors.TEXT_SECONDARY, width=10, anchor="w").pack(side="left")
+        var_name = tk.StringVar(value=name)
+        self._make_entry(row1, var_name, width=30)
+        fields["Name"] = var_name
+
+        row2 = tk.Frame(inner, bg=Colors.CARD_BG)
+        row2.pack(fill="x", pady=2)
+        tk.Label(row2, text="URL", font=Fonts.SMALL, bg=Colors.CARD_BG,
+                 fg=Colors.TEXT_SECONDARY, width=10, anchor="w").pack(side="left")
+        var_url = tk.StringVar(value=url)
+        e_url = self._make_entry(row2, var_url, width=60)
+        e_url.pack(side="left", fill="x", expand=True)
+        fields["URL"] = var_url
+
+        row3 = tk.Frame(inner, bg=Colors.CARD_BG)
+        row3.pack(fill="x", pady=2)
+        tk.Label(row3, text="快捷键", font=Fonts.SMALL, bg=Colors.CARD_BG,
+                 fg=Colors.TEXT_SECONDARY, width=10, anchor="w").pack(side="left")
+        var_key = tk.StringVar(value=key)
+        self._make_entry(row3, var_key, width=20)
+        fields["Key"] = var_key
+
+        self._selection_widgets.append((card, fields))
+
+    def _build_themes_editor(self, page):
+        """构建自定义主题可视化编辑器。"""
+        hint_frame = tk.Frame(page, bg=Colors.ACCENT_LIGHT)
+        hint_frame.pack(fill="x", padx=28, pady=(0, 12))
+        tk.Label(hint_frame, text=(
+            "💡 自定义主题可以在 SumatraPDF 的 设置 → 主题 菜单中选择。\n"
+            "ColorizeControls 设为 true 时，Windows 控件（菜单、工具栏等）也会使用主题颜色。"
+        ), font=Fonts.SMALL, bg=Colors.ACCENT_LIGHT, fg=Colors.ACCENT,
+            justify="left", padx=16, pady=10).pack(anchor="w")
+
+        existing = self._get_array_entries("Themes",
+                                            ["Name", "TextColor", "BackgroundColor",
+                                             "ControlBackgroundColor", "LinkColor", "ColorizeControls"])
+
+        self._theme_widgets = []
+
+        # 预设主题
+        presets = [
+            ("Solarized Dark", "#839496", "#002b36", "#073642", "#268bd2"),
+            ("Dracula", "#f8f8f2", "#282a36", "#44475a", "#8be9fd"),
+            ("Nord", "#d8dee9", "#2e3440", "#3b4252", "#88c0d0"),
+            ("One Dark", "#abb2bf", "#282c34", "#21252b", "#61afef"),
+            ("Greeny", "#FDD085", "#4F6232", "#1E3304", "#A2E53B"),
+        ]
+
+        preset_frame = tk.Frame(page, bg=Colors.BG)
+        preset_frame.pack(fill="x", padx=28, pady=(0, 8))
+        tk.Label(preset_frame, text="快速添加预设主题：", font=Fonts.SMALL,
+                 bg=Colors.BG, fg=Colors.TEXT_SECONDARY).pack(side="left")
+        for name, text_c, bg_c, ctrl_c, link_c in presets:
+            btn = tk.Button(preset_frame, text=name, font=Fonts.SMALL,
+                            bg=Colors.HOVER, fg=Colors.TEXT, bd=0, padx=8, pady=2,
+                            cursor="hand2",
+                            command=lambda n=name, t=text_c, b=bg_c, c=ctrl_c, l=link_c:
+                            self._add_theme_card(n, t, b, c, l, "true"))
+            btn.pack(side="left", padx=4)
+
+        add_btn = tk.Button(preset_frame, text="+ 自定义", font=Fonts.SMALL,
+                            bg=Colors.ACCENT, fg="white", bd=0, padx=8, pady=2,
+                            cursor="hand2",
+                            command=lambda: self._add_theme_card("", "", "", "", "", "true"))
+        add_btn.pack(side="left", padx=4)
+
+        self._theme_list_frame = tk.Frame(page, bg=Colors.BG)
+        self._theme_list_frame.pack(fill="x", padx=28)
+
+        for theme in existing:
+            self._add_theme_card(
+                theme.get("Name", ""),
+                theme.get("TextColor", ""),
+                theme.get("BackgroundColor", ""),
+                theme.get("ControlBackgroundColor", ""),
+                theme.get("LinkColor", ""),
+                theme.get("ColorizeControls", "true"),
+            )
+
+    def _add_theme_card(self, name, text_c, bg_c, ctrl_c, link_c, colorize):
+        """添加一个主题卡片。"""
+        card = tk.Frame(self._theme_list_frame, bg=Colors.CARD_BG,
+                        highlightbackground=Colors.BORDER, highlightthickness=1)
+        card.pack(fill="x", pady=(0, 8))
+        inner = tk.Frame(card, bg=Colors.CARD_BG)
+        inner.pack(fill="x", padx=16, pady=12)
+
+        del_btn = tk.Button(inner, text="✕", font=Fonts.SMALL, bg=Colors.CARD_BG,
+                            fg=Colors.TEXT_MUTED, bd=0, cursor="hand2",
+                            command=lambda: card.destroy())
+        del_btn.pack(anchor="e")
+
+        fields = {}
+
+        # 主题名
+        row0 = tk.Frame(inner, bg=Colors.CARD_BG)
+        row0.pack(fill="x", pady=2)
+        tk.Label(row0, text="主题名称", font=Fonts.SMALL, bg=Colors.CARD_BG,
+                 fg=Colors.TEXT_SECONDARY, width=14, anchor="w").pack(side="left")
+        var_name = tk.StringVar(value=name)
+        self._make_entry(row0, var_name, width=30)
+        fields["Name"] = var_name
+
+        # 颜色行
+        color_items = [
+            ("文字颜色", "TextColor", text_c),
+            ("背景颜色", "BackgroundColor", bg_c),
+            ("控件背景", "ControlBackgroundColor", ctrl_c),
+            ("链接颜色", "LinkColor", link_c),
+        ]
+
+        for label, key, val in color_items:
+            row = tk.Frame(inner, bg=Colors.CARD_BG)
+            row.pack(fill="x", pady=2)
+            tk.Label(row, text=label, font=Fonts.SMALL, bg=Colors.CARD_BG,
+                     fg=Colors.TEXT_SECONDARY, width=14, anchor="w").pack(side="left")
+            color_btn = ColorButton(row, color_str=val)
+            color_btn.pack(side="left")
+            fields[key] = color_btn
+
+        # ColorizeControls
+        row_c = tk.Frame(inner, bg=Colors.CARD_BG)
+        row_c.pack(fill="x", pady=2)
+        tk.Label(row_c, text="着色控件", font=Fonts.SMALL, bg=Colors.CARD_BG,
+                 fg=Colors.TEXT_SECONDARY, width=14, anchor="w").pack(side="left")
+        var_colorize = tk.BooleanVar(value=colorize.lower() == "true")
+        tk.Checkbutton(row_c, text="ColorizeControls（让菜单、工具栏等也使用主题颜色）",
+                       variable=var_colorize, font=Fonts.SMALL,
+                       bg=Colors.CARD_BG, fg=Colors.TEXT,
+                       selectcolor=Colors.CARD_BG).pack(side="left")
+        fields["ColorizeControls"] = var_colorize
+
+        # 预览色块
+        preview_frame = tk.Frame(inner, bg=Colors.CARD_BG)
+        preview_frame.pack(fill="x", pady=(8, 0))
+
+        def _update_preview():
+            for w in preview_frame.winfo_children():
+                w.destroy()
+            bg = fields["BackgroundColor"].get_value() if hasattr(fields["BackgroundColor"], 'get_value') else bg_c
+            text = fields["TextColor"].get_value() if hasattr(fields["TextColor"], 'get_value') else text_c
+            link = fields["LinkColor"].get_value() if hasattr(fields["LinkColor"], 'get_value') else link_c
+            if bg:
+                preview = tk.Frame(preview_frame, bg=bg, padx=12, pady=8)
+                preview.pack(side="left", padx=4)
+                tk.Label(preview, text="示例文字", bg=bg,
+                         fg=text or "#000000", font=Fonts.SMALL).pack()
+                tk.Label(preview, text="链接样式", bg=bg,
+                         fg=link or "#0000ff", font=Fonts.SMALL).pack()
+
+        _update_preview()
+
+        self._theme_widgets.append((card, fields))
+
+    def _get_array_entries(self, array_name, field_names):
+        """从解析树中提取数组类型的条目。"""
+        result = []
+        for entry in self._parse_tree if hasattr(self, '_parse_tree') else []:
+            pass
+        # 从 settings_file 的解析树中获取
+        for entry in self.settings_file._parse_tree:
+            if entry[0] == "struct" and entry[1] == array_name:
+                for item in entry[2]:
+                    if item[0] == "struct" and item[1] == "":
+                        entry_dict = {}
+                        for sub in item[2]:
+                            if sub[0] == "kv":
+                                entry_dict[sub[1]] = sub[2]
+                        result.append(entry_dict)
+        return result
 
     def _build_shortcuts_editor(self, page):
         """构建快捷键可视化编辑器。"""
@@ -1328,6 +1682,84 @@ class SettingsEditor(tk.Tk):
                     else:
                         shortcuts.append(info)
             self.settings_file.set_shortcuts(shortcuts)
+
+        # 收集外部查看器
+        if hasattr(self, '_viewer_widgets'):
+            viewers = []
+            for card, fields in self._viewer_widgets:
+                if not card.winfo_exists():
+                    continue
+                cmd = fields["CommandLine"].get().strip()
+                if cmd:
+                    viewers.append({
+                        "CommandLine": cmd,
+                        "Name": fields["Name"].get().strip(),
+                        "Filter": fields["Filter"].get().strip(),
+                        "Key": fields["Key"].get().strip(),
+                    })
+            self._set_array_entries("ExternalViewers", viewers)
+
+        # 收集选中文字处理
+        if hasattr(self, '_selection_widgets'):
+            handlers = []
+            for card, fields in self._selection_widgets:
+                if not card.winfo_exists():
+                    continue
+                url = fields["URL"].get().strip()
+                if url:
+                    handlers.append({
+                        "URL": url,
+                        "Name": fields["Name"].get().strip(),
+                        "Key": fields["Key"].get().strip(),
+                    })
+            self._set_array_entries("SelectionHandlers", handlers)
+
+        # 收集主题
+        if hasattr(self, '_theme_widgets'):
+            themes = []
+            for card, fields in self._theme_widgets:
+                if not card.winfo_exists():
+                    continue
+                name = ""
+                entry_dict = {}
+                for k, v in fields.items():
+                    if k == "Name":
+                        name = v.get().strip() if isinstance(v, tk.StringVar) else ""
+                        entry_dict[k] = name
+                    elif isinstance(v, ColorButton):
+                        entry_dict[k] = v.get_value()
+                    elif isinstance(v, tk.BooleanVar):
+                        entry_dict[k] = "true" if v.get() else "false"
+                    elif isinstance(v, tk.StringVar):
+                        entry_dict[k] = v.get().strip()
+                if name:
+                    themes.append(entry_dict)
+            self._set_array_entries("Themes", themes)
+
+    def _set_array_entries(self, array_name, entries):
+        """将数组条目写入设置文件的解析树。"""
+        new_items = []
+        for entry in entries:
+            entry_items = []
+            for k, v in entry.items():
+                if v:
+                    entry_items.append(("kv", k, v))
+            new_items.append(("struct", "", entry_items))
+
+        # 在解析树中找到并替换
+        for i, entry in enumerate(self.settings_file._parse_tree):
+            if entry[0] == "struct" and entry[1] == array_name:
+                self.settings_file._parse_tree[i] = (entry[0], entry[1], new_items)
+                return
+
+        # 没找到，添加到末尾
+        insert_idx = len(self.settings_file._parse_tree)
+        for i in range(len(self.settings_file._parse_tree) - 1, -1, -1):
+            if self.settings_file._parse_tree[i][0] == "comment":
+                insert_idx = i
+            else:
+                break
+        self.settings_file._parse_tree.insert(insert_idx, ("struct", array_name, new_items))
 
     def _open_file(self):
         path = filedialog.askopenfilename(
