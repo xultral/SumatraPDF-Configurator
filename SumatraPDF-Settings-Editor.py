@@ -881,25 +881,11 @@ class SettingsEditor(tk.Tk):
                     row.extend([248, 249, 250]) # 背景色
             pixels.append(row)
 
-        # 构建 PPM 格式然后转为 PhotoImage
-        ppm_header = f"P6 {size} {size} 255\n".encode()
-        ppm_data = ppm_header
-        for row in pixels:
-            for r, g, b in row:
-                ppm_data += bytes([r, g, b])
-
-        try:
-            self._icon_photo = tk.PhotoImage(data=ppm_data)
-            # PhotoImage 不直接支持 PPM data，用 base64 方式
-            raise Exception("use base64")
-        except Exception:
-            # 用 base64 编码的 GIF
-            import base64
-            # 生成一个简单的 GIF 图标
-            gif_data = self._create_gear_gif(size, pixels)
-            if gif_data:
-                self._icon_photo = tk.PhotoImage(data=gif_data)
-                self.iconphoto(False, self._icon_photo)
+        # 生成 GIF 图标
+        gif_data = self._create_gear_gif(size, pixels)
+        if gif_data:
+            self._icon_photo = tk.PhotoImage(data=gif_data)
+            self.iconphoto(False, self._icon_photo)
 
     def _create_gear_gif(self, size, pixels):
         """生成齿轮图标的 GIF base64 数据。"""
