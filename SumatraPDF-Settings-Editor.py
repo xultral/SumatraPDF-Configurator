@@ -847,170 +847,22 @@ class SettingsEditor(tk.Tk):
         self._build_ui()
 
     def _set_icon(self):
-        """用代码绘制一个齿轮图标作为窗口图标。"""
-        import math
-
-        size = 32
-        pixels = []
-        cx, cy = size // 2, size // 2
-        r_outer = 13
-        r_inner = 8
-        r_center = 5
-        teeth = 8
-
-        for y in range(size):
-            row = []
-            for x in range(size):
-                dx, dy = x - cx, y - cy
-                dist = (dx * dx + dy * dy) ** 0.5
-                angle = math.atan2(dy, dx)
-
-                # 齿轮齿的角度
-                tooth_angle = (angle + math.pi) / (2 * math.pi) * teeth
-                tooth_frac = tooth_angle - int(tooth_angle)
-                is_tooth = 0.25 < tooth_frac < 0.75
-                r_limit = r_outer if is_tooth else r_inner
-
-                if r_center < dist < r_limit:
-                    row.extend([59, 130, 246])  # 蓝色齿轮
-                elif dist <= r_center and dist > 2:
-                    row.extend([30, 58, 138])   # 深蓝中心
-                elif dist <= 2:
-                    row.extend([255, 255, 255]) # 白色中心点
-                else:
-                    row.extend([248, 249, 250]) # 背景色
-            pixels.append(row)
-
-        # 生成 GIF 图标
-        gif_data = self._create_gear_gif(size, pixels)
-        if gif_data:
-            self._icon_photo = tk.PhotoImage(data=gif_data)
-            self.iconphoto(False, self._icon_photo)
-
-    def _create_gear_gif(self, size, pixels):
-        """生成齿轮图标的 GIF base64 数据。"""
-        import base64, io, struct
-
-        # 收集所有使用的颜色（pixels 是 [[r,g,b,r,g,b,...], ...] 格式）
-        colors = set()
-        for row in pixels:
-            for i in range(0, len(row), 3):
-                colors.add((row[i], row[i + 1], row[i + 2]))
-
-        color_list = list(colors)
-        color_map = {c: i for i, c in enumerate(color_list)}
-
-        # 找到最小的 2 的幂作为颜色表大小
-        n_colors = 2
-        while n_colors < len(color_list):
-            n_colors *= 2
-        if n_colors > 256:
-            return None
-
-        # 补齐颜色表
-        while len(color_list) < n_colors:
-            color_list.append((0, 0, 0))
-
-        # 构建 GIF
-        buf = io.BytesIO()
-
-        # GIF89a header
-        buf.write(b'GIF89a')
-        buf.write(struct.pack('<HH', size, size))  # 宽高
-        buf.write(b'\x87')  # GCTF=1, 颜色分辨率=7
-        buf.write(b'\x00')  # 背景色索引
-        buf.write(b'\x00')  # 像素宽高比
-
-        # 全局颜色表
-        for r, g, b in color_list[:n_colors]:
-            buf.write(bytes([r, g, b]))
-
-        # 图像描述符
-        buf.write(b'\x2c')  # 图像分隔符
-        buf.write(struct.pack('<HH', 0, 0))  # 左上角
-        buf.write(struct.pack('<HH', size, size))  # 宽高
-        buf.write(b'\x00')  # 无局部颜色表
-
-        # LZW 压缩
-        min_code_size = 8
-        buf.write(bytes([min_code_size]))
-
-        # 简单的未压缩数据（用 GIF 的 LZW 最小编码大小=8 来简化）
-        # 实际上用未压缩方式写
-        pixels_flat = []
-        for row in pixels:
-            for i in range(0, len(row), 3):
-                idx = color_map.get((row[i], row[i + 1], row[i + 2]), 0)
-                pixels_flat.append(idx)
-
-        # 使用 zlib 的 deflate 来模拟 LZW（GIF 的 LZW 类似）
-        # 但 GIF LZW 不等于 zlib，所以我们用一个简单的实现
-        clear_code = 1 << min_code_size
-        eoi_code = clear_code + 1
-
-        # 简单的 GIF LZW 编码
-        code_size = min_code_size + 1
-        next_code = eoi_code + 1
-        table = {}
-        for i in range(clear_code):
-            table[(i,)] = i
-
-        bit_buf = 0
-        bit_count = 0
-        out_bytes = bytearray()
-
-        def write_code(code):
-            nonlocal bit_buf, bit_count
-            bit_buf |= code << bit_count
-            bit_count += code_size
-            while bit_count >= 8:
-                out_bytes.append(bit_buf & 0xff)
-                bit_buf >>= 8
-                bit_count -= 8
-
-        write_code(clear_code)
-
-        w = ()
-        for pixel in pixels_flat:
-            w_plus = w + (pixel,)
-            if w_plus in table:
-                w = w_plus
-            else:
-                write_code(table[w])
-                if next_code < 4096:
-                    table[w_plus] = next_code
-                    next_code += 1
-                    if next_code > (1 << code_size) and code_size < 12:
-                        code_size += 1
-                else:
-                    write_code(clear_code)
-                    table = {}
-                    for i in range(clear_code):
-                        table[(i,)] = i
-                    next_code = eoi_code + 1
-                    code_size = min_code_size + 1
-                w = (pixel,)
-
-        if w:
-            write_code(table[w])
-
-        write_code(eoi_code)
-
-        if bit_count > 0:
-            out_bytes.append(bit_buf & 0xff)
-
-        # 写入子数据块
-        idx = 0
-        while idx < len(out_bytes):
-            chunk_size = min(255, len(out_bytes) - idx)
-            buf.write(bytes([chunk_size]))
-            buf.write(out_bytes[idx:idx + chunk_size])
-            idx += chunk_size
-
-        buf.write(b'\x00')  # 块终止符
-        buf.write(b'\x3b')  # GIF 结束符
-
-        return base64.b64encode(buf.getvalue()).decode('ascii')
+        """使用 logo.png 作为窗口图标。"""
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        candidates = [
+            os.path.join(script_dir, "logo.png"),
+            os.path.join(os.path.dirname(script_dir), "logo.png"),
+        ]
+        for logo_path in candidates:
+            if os.path.isfile(logo_path):
+                try:
+                    from PIL import Image, ImageTk
+                    img = Image.open(logo_path)
+                    self._icon_photo = ImageTk.PhotoImage(img)
+                    self.iconphoto(False, self._icon_photo)
+                    return
+                except Exception:
+                    pass
 
     def _load_file(self, path: str):
         try:
