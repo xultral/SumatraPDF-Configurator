@@ -1,0 +1,655 @@
+
+CheckForUpdates = false
+CustomScreenDPI = 0
+DefaultDisplayMode = automatic
+DefaultZoom = fit page
+EnableTeXEnhancements = false
+EscToExit = false
+FullPathInTitle = false
+LazyLoading = false
+MainWindowBackground = #80fff200
+NoHomeTab = false
+HomePageSortByFrequentlyRead = false
+ReloadModifiedDocuments = true
+RememberOpenedFiles = true
+RememberStatePerDocument = true
+RestoreSession = true
+ReuseInstance = false
+ShowMenubar = true
+ShowToolbar = true
+ShowFavorites = false
+ShowToc = true
+ShowLinks = false
+ShowStartPage = true
+SidebarDx = 329
+ScrollbarInSinglePage = false
+SmoothScroll = false
+FastScrollOverScrollbar = false
+PreventSleepInFullscreen = true
+TabWidth = 300
+Theme = Light
+TocDy = 0
+ToolbarSize = 18
+TreeFontName = automatic
+TreeFontSize = 0
+UIFontSize = 0
+DisableAntiAlias = false
+UseSysColors = false
+UseTabs = true
+ZoomLevels = 8.33 12.5 18 25 33.33 50 66.67 75 100 125 150 200 300 400 600 800 1000 1200 1600 2000 2400 3200 4800 6400
+ZoomIncrement = 0
+
+FixedPageUI [
+    TextColor = #000000
+    BackgroundColor = #ffffff
+    SelectionColor = #f5fc0c
+    WindowMargin = 2 4 2 4
+    PageSpacing = 4 4
+    InvertColors = false
+    HideScrollbars = false
+]
+
+EBookUI [
+    FontSize = 0
+    LayoutDx = 0
+    LayoutDy = 0
+    IgnoreDocumentCSS = false
+]
+
+ComicBookUI [
+    WindowMargin = 0 0 0 0
+    PageSpacing = 4 4
+    CbxMangaMode = false
+]
+
+ChmUI [
+    UseFixedPageUI = false
+]
+
+Annotations [
+    HighlightColor = #ffff00
+    UnderlineColor = #00ff00
+    SquigglyColor = #ff00ff
+    StrikeOutColor = #ff0000
+    FreeTextColor = 
+    FreeTextBackgroundColor = 
+    FreeTextOpacity = 100
+    FreeTextSize = 12
+    FreeTextBorderWidth = 1
+    TextIconColor = 
+    TextIconType = 
+    DefaultAuthor = 
+]
+
+ExternalViewers [
+]
+
+ForwardSearch [
+    HighlightOffset = 0
+    HighlightWidth = 15
+    HighlightColor = #6581ff
+    HighlightPermanent = false
+]
+
+PrinterDefaults [
+    PrintScale = shrink
+]
+
+SelectionHandlers [
+]
+
+Shortcuts [
+]
+
+Themes [
+]
+
+UiLanguage = cn
+WindowState = 2
+WindowPos = 907 -53 1022 1128
+FileStates [
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    TocState = 13 20 23 24
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    TocState = 13 20 23 24
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    FilePath = D:\study\红宝书\系统架构设计师红宝书一本全ing.pdf
+    Favorites [
+    ]
+    IsPinned = false
+    IsMissing = false
+    OpenCount = 0
+    UseDefaultState = false
+    DisplayMode = continuous
+    ScrollPos = -1 500.6
+    PageNo = 24
+    Zoom = 125
+    Rotation = 0
+    WindowState = 2
+    WindowPos = 342 -18 872 1128
+    ShowToc = true
+    SidebarDx = 351
+    DisplayR2L = false
+    ReparseIdx = 0
+    TocState = 13 20 23 24
+]
+SessionData [
+    TabStates [
+        FilePath = C:\Users\d7569\OneDrive\红宝书11月已标注\系统架构设计师红宝书一本全.pdf
+        DisplayMode = continuous
+        PageNo = 8
+        Zoom = fit page
+        Rotation = 0
+        ScrollPos = -1 86.2823
+        ShowToc = true
+    ]
+    TabIndex = 2
+    WindowState = 2
+    WindowPos = 907 -53 1022 1128
+    SidebarDx = 329
+]
+TimeOfLastUpdateCheck = 31264023 -1928118402
+OpenCountWeek = 809
+
+TreeFontWeightOffset = 0
